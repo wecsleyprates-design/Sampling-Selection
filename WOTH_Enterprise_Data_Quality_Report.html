@@ -1,0 +1,3056 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WOTH IA - Comprehensive Business Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .metrics-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        .metric-card {
+            flex: 1;
+            background: #fdfdfd;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .analyst-notes {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .analyst-notes h4 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .chart-container {
+            margin: 30px 0;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .timestamp {
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .rule-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 5px solid #3498db;
+        }
+        .rule-table th {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+        .rule-table td, .rule-table th {
+            border-bottom: 1px solid #455a64;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Comprehensive Data Quality & Standardization Report</h1>
+            <p>Generated on: 2026-03-11 15:14:08</p>
+        </div>
+
+        
+    <div class="section">
+        <h2>1. Global Dataset Quality Overview (Raw)</h2>
+        
+        
+        <div class="metrics-container">
+            
+    <div class="metric-card">
+        <div style="font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Total Rows</div>
+        <div class="metric-value" style="color: #2980b9;">10,000</div>
+    </div>
+    
+    <div class="metric-card">
+        <div style="font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Good Rows</div>
+        <div class="metric-value" style="color: #27ae60;">0</div>
+    </div>
+    
+    <div class="metric-card">
+        <div style="font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Rows w/ Issues</div>
+        <div class="metric-value" style="color: #e74c3c;">10,000</div>
+    </div>
+    
+        </div>
+        
+        
+    </div>
+    
+    <div class="section">
+        <h2>2. Detailed Issue Report (Anomalies)</h2>
+        
+        
+        
+        <div class="chart-container">
+            <div style="flex:1;"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="ecd10603-7824-4794-9258-defef388163d" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ecd10603-7824-4794-9258-defef388163d")) {                    Plotly.newPlot(                        "ecd10603-7824-4794-9258-defef388163d",                        [{"hovertemplate":"Severity=%{x}\u003cbr\u003eCount=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"High","marker":{"color":"#e74c3c","pattern":{"shape":""}},"name":"High","orientation":"v","showlegend":true,"text":{"dtype":"f8","bdata":"AAAAAADgdkA="},"textposition":"auto","x":["High"],"xaxis":"x","y":{"dtype":"i2","bdata":"bgE="},"yaxis":"y","type":"bar"},{"hovertemplate":"Severity=%{x}\u003cbr\u003eCount=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Medium","marker":{"color":"#f39c12","pattern":{"shape":""}},"name":"Medium","orientation":"v","showlegend":true,"text":{"dtype":"f8","bdata":"AAAAAACIw0A="},"textposition":"auto","x":["Medium"],"xaxis":"x","y":{"dtype":"i2","bdata":"ECc="},"yaxis":"y","type":"bar"},{"hovertemplate":"Severity=%{x}\u003cbr\u003eCount=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Low","marker":{"color":"#3498db","pattern":{"shape":""}},"name":"Low","orientation":"v","showlegend":true,"text":{"dtype":"f8","bdata":"AAAAAAAANEA="},"textposition":"auto","x":["Low"],"xaxis":"x","y":{"dtype":"i1","bdata":"FA=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"candlestick":[{"decreasing":{"line":{"color":"#000033"}},"increasing":{"line":{"color":"#000032"}},"type":"candlestick"}],"contourcarpet":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contourcarpet"}],"contour":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contour"}],"heatmap":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"heatmap"}],"histogram2d":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"histogram2d"}],"icicle":[{"textfont":{"color":"white"},"type":"icicle"}],"sankey":[{"textfont":{"color":"#000036"},"type":"sankey"}],"scatter":[{"marker":{"line":{"width":0}},"type":"scatter"}],"table":[{"cells":{"fill":{"color":"#000038"},"font":{"color":"#000037"},"line":{"color":"#000039"}},"header":{"fill":{"color":"#000040"},"font":{"color":"#000036"},"line":{"color":"#000039"}},"type":"table"}],"waterfall":[{"connector":{"line":{"color":"#000036","width":2}},"decreasing":{"marker":{"color":"#000033"}},"increasing":{"marker":{"color":"#000032"}},"totals":{"marker":{"color":"#000034"}},"type":"waterfall"}]},"layout":{"coloraxis":{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorscale":{"diverging":[[0.0,"#000021"],[0.1,"#000022"],[0.2,"#000023"],[0.3,"#000024"],[0.4,"#000025"],[0.5,"#000026"],[0.6,"#000027"],[0.7,"#000028"],[0.8,"#000029"],[0.9,"#000030"],[1.0,"#000031"]],"sequential":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"sequentialminus":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorway":["#000001","#000002","#000003","#000004","#000005","#000006","#000007","#000008","#000009","#000010"]}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":""},"categoryorder":"array","categoryarray":["High","Medium","Low"]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":""}},"legend":{"title":{"text":"Severity"},"tracegroupgap":0,"bgcolor":"rgba(0,0,0,0)"},"title":{"text":"Issues by Severity"},"barmode":"relative","showlegend":false,"font":{"color":"#e0e0e0"},"plot_bgcolor":"rgba(0,0,0,0)","paper_bgcolor":"rgba(0,0,0,0)"},                        {"responsive": true}                    )                };            </script>        </div></div>
+            <div style="flex:1;"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="11801363-042c-479a-a649-20b2ce26f82a" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("11801363-042c-479a-a649-20b2ce26f82a")) {                    Plotly.newPlot(                        "11801363-042c-479a-a649-20b2ce26f82a",                        [{"customdata":[["SPECIAL CHARACTERS"],["MISSING"],["FORMAT WHITESPACE"]],"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"hole":0.4,"hovertemplate":"Issue Type=%{customdata[0]}\u003cbr\u003eCount=%{value}\u003cextra\u003e\u003c\u002fextra\u003e","labels":["SPECIAL CHARACTERS","MISSING","FORMAT WHITESPACE"],"legendgroup":"","marker":{"colors":["rgb(102, 197, 204)","rgb(246, 207, 113)","rgb(248, 156, 116)"]},"name":"","showlegend":true,"values":{"dtype":"i2","bdata":"ECduARQA"},"type":"pie","textinfo":"percent+label","textposition":"inside"}],                        {"template":{"data":{"candlestick":[{"decreasing":{"line":{"color":"#000033"}},"increasing":{"line":{"color":"#000032"}},"type":"candlestick"}],"contourcarpet":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contourcarpet"}],"contour":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contour"}],"heatmap":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"heatmap"}],"histogram2d":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"histogram2d"}],"icicle":[{"textfont":{"color":"white"},"type":"icicle"}],"sankey":[{"textfont":{"color":"#000036"},"type":"sankey"}],"scatter":[{"marker":{"line":{"width":0}},"type":"scatter"}],"table":[{"cells":{"fill":{"color":"#000038"},"font":{"color":"#000037"},"line":{"color":"#000039"}},"header":{"fill":{"color":"#000040"},"font":{"color":"#000036"},"line":{"color":"#000039"}},"type":"table"}],"waterfall":[{"connector":{"line":{"color":"#000036","width":2}},"decreasing":{"marker":{"color":"#000033"}},"increasing":{"marker":{"color":"#000032"}},"totals":{"marker":{"color":"#000034"}},"type":"waterfall"}]},"layout":{"coloraxis":{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorscale":{"diverging":[[0.0,"#000021"],[0.1,"#000022"],[0.2,"#000023"],[0.3,"#000024"],[0.4,"#000025"],[0.5,"#000026"],[0.6,"#000027"],[0.7,"#000028"],[0.8,"#000029"],[0.9,"#000030"],[1.0,"#000031"]],"sequential":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"sequentialminus":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorway":["#000001","#000002","#000003","#000004","#000005","#000006","#000007","#000008","#000009","#000010"]}},"legend":{"tracegroupgap":0,"bgcolor":"rgba(0,0,0,0)"},"title":{"text":"Proportion of Issue Types"},"piecolorway":["rgb(102, 197, 204)","rgb(246, 207, 113)","rgb(248, 156, 116)","rgb(220, 176, 242)","rgb(135, 197, 95)","rgb(158, 185, 243)","rgb(254, 136, 177)","rgb(201, 219, 116)","rgb(139, 224, 164)","rgb(180, 151, 231)","rgb(179, 179, 179)"],"showlegend":false,"font":{"color":"#e0e0e0"},"plot_bgcolor":"rgba(0,0,0,0)","paper_bgcolor":"rgba(0,0,0,0)"},                        {"responsive": true}                    )                };            </script>        </div></div>
+        </div>
+        
+        
+        <h3>Top Anomalies by Feature & Severity</h3>
+        <table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Record ID</th>
+      <th>Feature</th>
+      <th>Severity</th>
+      <th>Issue Type</th>
+      <th>Original Bad Value</th>
+      <th>Resolution Strategy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>101</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>177</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>267</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>269</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>271</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>272</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>273</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>274</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>275</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>278</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>282</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>283</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>286</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>287</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>288</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>293</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>294</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>326</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>327</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>363</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>453</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>457</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>478</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>547</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>554</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>555</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>591</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>592</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>603</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>663</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>670</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>700</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>741</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>761</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>766</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>801</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>802</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>854</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>879</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>914</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>927</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1013</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1047</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1056</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1057</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1098</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1103</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1140</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1199</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1233</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1245</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1339</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1361</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1401</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1429</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1451</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1453</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1473</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1492</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1512</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1523</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1655</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1724</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1751</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1785</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1800</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1862</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1883</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1902</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1909</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1920</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1987</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>1992</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2017</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2063</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2085</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2107</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2119</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2127</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2201</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2207</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2212</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2244</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2255</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2277</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2338</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2344</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+    <tr>
+      <td>2350</td>
+      <td>dba_nm</td>
+      <td>High</td>
+      <td>MISSING</td>
+      <td>nan</td>
+      <td>Flag/Null representation</td>
+    </tr>
+  </tbody>
+</table>
+        
+    </div>
+    
+    <div class="section">
+        <h2>3. Clean vs Original Modifications</h2>
+        
+        
+        <div class="metrics-container">
+            
+    <div class="metric-card">
+        <div style="font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Original Missing</div>
+        <div class="metric-value" style="color: #e74c3c;">366</div>
+    </div>
+    
+        </div>
+        
+        
+        <h3>Cleaned Feature Quality Profile</h3>
+        <div class="chart-container">
+            <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="751b90e0-3f03-47fa-84af-daacf9c4a423" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("751b90e0-3f03-47fa-84af-daacf9c4a423")) {                    Plotly.newPlot(                        "751b90e0-3f03-47fa-84af-daacf9c4a423",                        [{"hovertemplate":"Score=%{marker.color}\u003cbr\u003eColumn=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":{"dtype":"i1","bdata":"YmRkZGQ="},"coloraxis":"coloraxis","pattern":{"shape":""}},"name":"","orientation":"h","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAACAWEAAAAAAAABZQAAAAAAAAFlAAAAAAAAAWUAAAAAAAABZQA=="},"textposition":"auto","x":{"dtype":"i1","bdata":"YmRkZGQ="},"xaxis":"x","y":["dba_nm","uid","TIN","lgl_nm","business_address"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"candlestick":[{"decreasing":{"line":{"color":"#000033"}},"increasing":{"line":{"color":"#000032"}},"type":"candlestick"}],"contourcarpet":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contourcarpet"}],"contour":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"contour"}],"heatmap":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"heatmap"}],"histogram2d":[{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"type":"histogram2d"}],"icicle":[{"textfont":{"color":"white"},"type":"icicle"}],"sankey":[{"textfont":{"color":"#000036"},"type":"sankey"}],"scatter":[{"marker":{"line":{"width":0}},"type":"scatter"}],"table":[{"cells":{"fill":{"color":"#000038"},"font":{"color":"#000037"},"line":{"color":"#000039"}},"header":{"fill":{"color":"#000040"},"font":{"color":"#000036"},"line":{"color":"#000039"}},"type":"table"}],"waterfall":[{"connector":{"line":{"color":"#000036","width":2}},"decreasing":{"marker":{"color":"#000033"}},"increasing":{"marker":{"color":"#000032"}},"totals":{"marker":{"color":"#000034"}},"type":"waterfall"}]},"layout":{"coloraxis":{"colorscale":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorscale":{"diverging":[[0.0,"#000021"],[0.1,"#000022"],[0.2,"#000023"],[0.3,"#000024"],[0.4,"#000025"],[0.5,"#000026"],[0.6,"#000027"],[0.7,"#000028"],[0.8,"#000029"],[0.9,"#000030"],[1.0,"#000031"]],"sequential":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]],"sequentialminus":[[0.0,"#000011"],[0.1111111111111111,"#000012"],[0.2222222222222222,"#000013"],[0.3333333333333333,"#000014"],[0.4444444444444444,"#000015"],[0.5555555555555556,"#000016"],[0.6666666666666666,"#000017"],[0.7777777777777778,"#000018"],[0.8888888888888888,"#000019"],[1.0,"#000020"]]},"colorway":["#000001","#000002","#000003","#000004","#000005","#000006","#000007","#000008","#000009","#000010"]}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Score"},"range":[0,105]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Column"}},"coloraxis":{"colorbar":{"title":{"text":"Score"}},"colorscale":[[0.0,"#e74c3c"],[0.5,"#f39c12"],[1.0,"#27ae60"]],"cmin":0,"cmax":100,"showscale":false},"legend":{"tracegroupgap":0,"bgcolor":"rgba(0,0,0,0)"},"margin":{"t":60},"barmode":"relative","showlegend":false,"font":{"color":"#e0e0e0"},"plot_bgcolor":"rgba(0,0,0,0)","paper_bgcolor":"rgba(0,0,0,0)"},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+        
+        
+        
+        <h3>Row-Level Modification Diffs</h3>
+        <table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Row ID</th>
+      <th>Feature</th>
+      <th>Original Value</th>
+      <th>Standardization</th>
+      <th>Triggered Issue</th>
+      <th>Failure Reason</th>
+      <th>Resolution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>5</td>
+      <td>TIN</td>
+      <td>34606530</td>
+      <td>03-4606530</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>TIN</td>
+      <td>37269688</td>
+      <td>03-7269688</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>TIN</td>
+      <td>49684223</td>
+      <td>04-9684223</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>TIN</td>
+      <td>22602554</td>
+      <td>02-2602554</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>52</td>
+      <td>TIN</td>
+      <td>19401666</td>
+      <td>01-9401666</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>60</td>
+      <td>TIN</td>
+      <td>39522426</td>
+      <td>03-9522426</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>63</td>
+      <td>TIN</td>
+      <td>10642776</td>
+      <td>01-0642776</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>83</td>
+      <td>TIN</td>
+      <td>58362729</td>
+      <td>05-8362729</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>91</td>
+      <td>TIN</td>
+      <td>59486229</td>
+      <td>05-9486229</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>98</td>
+      <td>TIN</td>
+      <td>44567571</td>
+      <td>04-4567571</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>114</td>
+      <td>TIN</td>
+      <td>39489558</td>
+      <td>03-9489558</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>136</td>
+      <td>TIN</td>
+      <td>23309615</td>
+      <td>02-3309615</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>148</td>
+      <td>TIN</td>
+      <td>37326663</td>
+      <td>03-7326663</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>150</td>
+      <td>TIN</td>
+      <td>56641043</td>
+      <td>05-6641043</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>153</td>
+      <td>TIN</td>
+      <td>74567415</td>
+      <td>07-4567415</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>155</td>
+      <td>TIN</td>
+      <td>59504382</td>
+      <td>05-9504382</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>168</td>
+      <td>TIN</td>
+      <td>58703060</td>
+      <td>05-8703060</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>182</td>
+      <td>TIN</td>
+      <td>41701550</td>
+      <td>04-1701550</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>207</td>
+      <td>TIN</td>
+      <td>44341614</td>
+      <td>04-4341614</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>213</td>
+      <td>TIN</td>
+      <td>21504877</td>
+      <td>02-1504877</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>222</td>
+      <td>TIN</td>
+      <td>51521277</td>
+      <td>05-1521277</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>251</td>
+      <td>TIN</td>
+      <td>10545381</td>
+      <td>01-0545381</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>265</td>
+      <td>TIN</td>
+      <td>42545732</td>
+      <td>04-2545732</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>334</td>
+      <td>TIN</td>
+      <td>52530000</td>
+      <td>05-2530000</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>349</td>
+      <td>TIN</td>
+      <td>45048993</td>
+      <td>04-5048993</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>350</td>
+      <td>TIN</td>
+      <td>44021400</td>
+      <td>04-4021400</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>354</td>
+      <td>TIN</td>
+      <td>68991235</td>
+      <td>06-8991235</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>366</td>
+      <td>TIN</td>
+      <td>40059169</td>
+      <td>04-0059169</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>405</td>
+      <td>TIN</td>
+      <td>42667190</td>
+      <td>04-2667190</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>422</td>
+      <td>TIN</td>
+      <td>61601219</td>
+      <td>06-1601219</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>428</td>
+      <td>TIN</td>
+      <td>45043685</td>
+      <td>04-5043685</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>433</td>
+      <td>TIN</td>
+      <td>29748567</td>
+      <td>02-9748567</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>465</td>
+      <td>TIN</td>
+      <td>14393908</td>
+      <td>01-4393908</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>484</td>
+      <td>TIN</td>
+      <td>33403007</td>
+      <td>03-3403007</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>489</td>
+      <td>TIN</td>
+      <td>32222039</td>
+      <td>03-2222039</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>497</td>
+      <td>TIN</td>
+      <td>45059825</td>
+      <td>04-5059825</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>499</td>
+      <td>TIN</td>
+      <td>45058703</td>
+      <td>04-5058703</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>534</td>
+      <td>TIN</td>
+      <td>40665361</td>
+      <td>04-0665361</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>542</td>
+      <td>TIN</td>
+      <td>21772262</td>
+      <td>02-1772262</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>563</td>
+      <td>TIN</td>
+      <td>22004047</td>
+      <td>02-2004047</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>566</td>
+      <td>TIN</td>
+      <td>23710363</td>
+      <td>02-3710363</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>582</td>
+      <td>TIN</td>
+      <td>58453716</td>
+      <td>05-8453716</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>615</td>
+      <td>TIN</td>
+      <td>43214824</td>
+      <td>04-3214824</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>626</td>
+      <td>TIN</td>
+      <td>45055904</td>
+      <td>04-5055904</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>635</td>
+      <td>TIN</td>
+      <td>14481906</td>
+      <td>01-4481906</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>646</td>
+      <td>TIN</td>
+      <td>10905703</td>
+      <td>01-0905703</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>679</td>
+      <td>TIN</td>
+      <td>51995747</td>
+      <td>05-1995747</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>682</td>
+      <td>TIN</td>
+      <td>26589059</td>
+      <td>02-6589059</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>690</td>
+      <td>TIN</td>
+      <td>45044590</td>
+      <td>04-5044590</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>693</td>
+      <td>TIN</td>
+      <td>45071964</td>
+      <td>04-5071964</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>736</td>
+      <td>TIN</td>
+      <td>61443443</td>
+      <td>06-1443443</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>820</td>
+      <td>TIN</td>
+      <td>43497675</td>
+      <td>04-3497675</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>844</td>
+      <td>TIN</td>
+      <td>42754526</td>
+      <td>04-2754526</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>863</td>
+      <td>TIN</td>
+      <td>61100194</td>
+      <td>06-1100194</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>866</td>
+      <td>TIN</td>
+      <td>37085818</td>
+      <td>03-7085818</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>950</td>
+      <td>TIN</td>
+      <td>45000977</td>
+      <td>04-5000977</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>958</td>
+      <td>TIN</td>
+      <td>46440673</td>
+      <td>04-6440673</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>984</td>
+      <td>TIN</td>
+      <td>10814577</td>
+      <td>01-0814577</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>985</td>
+      <td>TIN</td>
+      <td>60046151</td>
+      <td>06-0046151</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>988</td>
+      <td>TIN</td>
+      <td>51904524</td>
+      <td>05-1904524</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>993</td>
+      <td>TIN</td>
+      <td>43344831</td>
+      <td>04-3344831</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1045</td>
+      <td>TIN</td>
+      <td>45004576</td>
+      <td>04-5004576</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1095</td>
+      <td>TIN</td>
+      <td>21966472</td>
+      <td>02-1966472</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1135</td>
+      <td>TIN</td>
+      <td>16718731</td>
+      <td>01-6718731</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1139</td>
+      <td>TIN</td>
+      <td>20533133</td>
+      <td>02-0533133</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1140</td>
+      <td>TIN</td>
+      <td>43632505</td>
+      <td>04-3632505</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1169</td>
+      <td>TIN</td>
+      <td>50000329</td>
+      <td>05-0000329</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1176</td>
+      <td>TIN</td>
+      <td>40024412</td>
+      <td>04-0024412</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1194</td>
+      <td>TIN</td>
+      <td>45054289</td>
+      <td>04-5054289</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1207</td>
+      <td>TIN</td>
+      <td>45095654</td>
+      <td>04-5095654</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1222</td>
+      <td>TIN</td>
+      <td>19997899</td>
+      <td>01-9997899</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1259</td>
+      <td>TIN</td>
+      <td>46079797</td>
+      <td>04-6079797</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1276</td>
+      <td>TIN</td>
+      <td>22743303</td>
+      <td>02-2743303</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1325</td>
+      <td>TIN</td>
+      <td>45037428</td>
+      <td>04-5037428</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1395</td>
+      <td>TIN</td>
+      <td>11766800</td>
+      <td>01-1766800</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1401</td>
+      <td>TIN</td>
+      <td>43444231</td>
+      <td>04-3444231</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1427</td>
+      <td>TIN</td>
+      <td>43666708</td>
+      <td>04-3666708</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1440</td>
+      <td>TIN</td>
+      <td>26194270</td>
+      <td>02-6194270</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1443</td>
+      <td>TIN</td>
+      <td>20813771</td>
+      <td>02-0813771</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1444</td>
+      <td>TIN</td>
+      <td>11917857</td>
+      <td>01-1917857</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1463</td>
+      <td>TIN</td>
+      <td>20289860</td>
+      <td>02-0289860</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1517</td>
+      <td>TIN</td>
+      <td>20534389</td>
+      <td>02-0534389</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1523</td>
+      <td>TIN</td>
+      <td>36445869</td>
+      <td>03-6445869</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1536</td>
+      <td>TIN</td>
+      <td>45071971</td>
+      <td>04-5071971</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1581</td>
+      <td>TIN</td>
+      <td>45054426</td>
+      <td>04-5054426</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1601</td>
+      <td>TIN</td>
+      <td>49832177</td>
+      <td>04-9832177</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1630</td>
+      <td>TIN</td>
+      <td>45067507</td>
+      <td>04-5067507</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1648</td>
+      <td>TIN</td>
+      <td>40047758</td>
+      <td>04-0047758</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1678</td>
+      <td>TIN</td>
+      <td>43700359</td>
+      <td>04-3700359</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1713</td>
+      <td>TIN</td>
+      <td>48416326</td>
+      <td>04-8416326</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1718</td>
+      <td>TIN</td>
+      <td>24226060</td>
+      <td>02-4226060</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1748</td>
+      <td>TIN</td>
+      <td>51328881</td>
+      <td>05-1328881</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1759</td>
+      <td>TIN</td>
+      <td>52533829</td>
+      <td>05-2533829</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1784</td>
+      <td>TIN</td>
+      <td>50476909</td>
+      <td>05-0476909</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1791</td>
+      <td>TIN</td>
+      <td>45087474</td>
+      <td>04-5087474</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1802</td>
+      <td>TIN</td>
+      <td>40062874</td>
+      <td>04-0062874</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1807</td>
+      <td>TIN</td>
+      <td>45059150</td>
+      <td>04-5059150</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1870</td>
+      <td>TIN</td>
+      <td>10860000</td>
+      <td>01-0860000</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1871</td>
+      <td>TIN</td>
+      <td>45061076</td>
+      <td>04-5061076</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+    <tr>
+      <td>1872</td>
+      <td>TIN</td>
+      <td>41802877</td>
+      <td>04-1802877</td>
+      <td>FORMAT_ISSUE</td>
+      <td></td>
+      <td>Resolved/Standardized</td>
+    </tr>
+  </tbody>
+</table>
+        
+    </div>
+    
+    <div class="section">
+        <h2>4. Standardization Business Rules & Data Checks</h2>
+        
+        
+        <div class="rule-box">
+            <b>Feature-Level Quality Checks & Engine Standardization</b><br>
+            The engine scans every explicit feature before calculating statistics. It categorizes invalid syntax and trims/nullifies non-conforming data to enforce standard schemas.
+        </div>
+        
+        <table class="rule-table">
+            <tr><th>Feature Domain</th><th>Flag Triggers</th><th>Standardization Resolution</th></tr>
+            <tr>
+                <td><b>Company/Legal Names</b></td>
+                <td>Special Chars (%, ^, $), Whitespaces</td>
+                <td>Stripping special characters, shrinking repeated whitespaces, converting to UPPERCASE.</td>
+            </tr>
+            <tr>
+                <td><b>Piped Addresses</b></td>
+                <td>Missing / Irregular Pipeline formats</td>
+                <td>Aggressively splits by pipe `|`. Cross-references <code>lgl_nm</code> / <code>dba_nm</code> and drops identified company prefixes before joining remaining data into clean arrays.</td>
+            </tr>
+            <tr>
+                <td><b>Tax ID (TIN)</b></td>
+                <td>Format Length Error (Not 9 digits)</td>
+                <td>Trims trailing `.0` floats. Strips syntaxes. Prepends `0` to exactly 8-digit TINs. Exposes unformatted matrix.</td>
+            </tr>
+            <tr>
+                <td><b>Telephony</b></td>
+                <td>Format Length Error (<10 or >11)</td>
+                <td>Pulls raw numbers out of strings. Checks length bounding constraint, assigns `+1 (XXX)` or `(XXX)` patterns dynamically.</td>
+            </tr>
+        </table>
+        
+        <div class="rule-box" style="border-left: 5px solid #e67e22;">
+            <b>Entity Resolution (Duplicative Clustering)</b><br>
+            Identifies overlapping entities structurally by cross-collating Name, Address, and TIN. 
+        </div>
+        <table class="rule-table">
+            <tr><th>Tag Priority</th><th>Categorization Logic</th><th>Pipeline Resolution Action</th></tr>
+            <tr><td><b>EXACT_DUPLICATE</b></td><td>Row is perfectly byte-for-byte identical.</td><td>Keeps the first row appearing in index; silently drops the rest.</td></tr>
+            <tr><td><b>IDENTITY_GROUP_FRAUD</b></td><td>Differing info but same structural entity, with at least 1 fraud flag.</td><td>Prioritizes keeping existing fraud entity to prevent leakage.</td></tr>
+            <tr><td><b>IDENTITY_GROUP_CLEAN</b></td><td>Differing info but same structural entity, safely clean.</td><td>Prioritizes preserving newest update entry; drops historical noise.</td></tr>
+            <tr><td><b>TECH_REAPPLICATION</b></td><td>TIN is mathematically identical, address shifts.</td><td>Keeps earliest chronology attempt, drops later churn.</td></tr>
+            <tr><td><b>INVALID_FOR_KYC</b></td><td>Total omission of name/TIN/zip metadata points.</td><td>Strict drop rule; Vendor API will reject this inherently.</td></tr>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2>5. Final Pristine Model Dataset Overview</h2>
+        
+        
+        <h3>Dataset Export Schema Preview (Top 50)</h3>
+        <table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>uid_received</th>
+      <th>TIN_received</th>
+      <th>lgl_nm_received</th>
+      <th>dba_nm_received</th>
+      <th>business_address_received</th>
+      <th>uid_worth</th>
+      <th>TIN_worth</th>
+      <th>TIN_worth_no_format</th>
+      <th>lgl_nm_worth</th>
+      <th>dba_nm_worth</th>
+      <th>address_1_worth</th>
+      <th>address_2_worth</th>
+      <th>city_worth</th>
+      <th>region_worth</th>
+      <th>zip_code_worth</th>
+      <th>country_worth</th>
+      <th>full_address_worth</th>
+      <th>Tag_worth</th>
+      <th>Description_worth</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AXP03200451</td>
+      <td>109580896</td>
+      <td>DANA &amp; SONS BABY PRF</td>
+      <td>DANA &amp; SONS LLC</td>
+      <td>106 WELLINGTON AVE|||SHORT HILLS|NJ|07078-2560|US</td>
+      <td>f11e1728d9f398209d2ab88ed5958ce11ec12df52a746ee07309ea820a1d4de5</td>
+      <td>10-9580896</td>
+      <td>109580896</td>
+      <td>DANA &amp; SONS BABY PRF</td>
+      <td>DANA &amp; SONS LLC</td>
+      <td>106 WELLINGTON AVE</td>
+      <td></td>
+      <td>SHORT HILLS</td>
+      <td>NJ</td>
+      <td>07078-2560</td>
+      <td>US</td>
+      <td>106 WELLINGTON AVE, SHORT HILLS, NJ, 07078-2560, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04971638</td>
+      <td>474485843</td>
+      <td>THE COMMERS COMPANY</td>
+      <td>COMMERS COMPANY</td>
+      <td>2303 WYCLIFF ST|STE 7A||SAINT PAUL|MN|55114-1278|US</td>
+      <td>532f4be9b7ae5f0487160f7b44cf992f7967c52a9423c20f12340faa78f799cf</td>
+      <td>47-4485843</td>
+      <td>474485843</td>
+      <td>THE COMMERS COMPANY</td>
+      <td>COMMERS COMPANY</td>
+      <td>2303 WYCLIFF ST</td>
+      <td>STE 7A</td>
+      <td>SAINT PAUL</td>
+      <td>MN</td>
+      <td>55114-1278</td>
+      <td>US</td>
+      <td>2303 WYCLIFF ST, STE 7A, SAINT PAUL, MN, 55114-1278, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03492960</td>
+      <td>553624472</td>
+      <td>MARK TENNER</td>
+      <td>NaN</td>
+      <td>121 QUAIL RUN RD|||HENDERSON|NV|89014-2129|US</td>
+      <td>6f0c96030a08e3346910338578aa321baf9ba95a9a2b7d45a3ebbc37348b3e24</td>
+      <td>55-3624472</td>
+      <td>553624472</td>
+      <td>MARK TENNER</td>
+      <td>NaN</td>
+      <td>121 QUAIL RUN RD</td>
+      <td></td>
+      <td>HENDERSON</td>
+      <td>NV</td>
+      <td>89014-2129</td>
+      <td>US</td>
+      <td>121 QUAIL RUN RD, HENDERSON, NV, 89014-2129, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01747679</td>
+      <td>363502777</td>
+      <td>S LANCI</td>
+      <td>NaN</td>
+      <td>7999 PASEO ESMERADO|||CARLSBAD|CA|92009-8935|US</td>
+      <td>c35aacdcf959bbca87359735770a793b082130fa00f6d2549e3a5945acb88321</td>
+      <td>36-3502777</td>
+      <td>363502777</td>
+      <td>S LANCI</td>
+      <td>NaN</td>
+      <td>7999 PASEO ESMERADO</td>
+      <td></td>
+      <td>CARLSBAD</td>
+      <td>CA</td>
+      <td>92009-8935</td>
+      <td>US</td>
+      <td>7999 PASEO ESMERADO, CARLSBAD, CA, 92009-8935, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03265812</td>
+      <td>213808741</td>
+      <td>CHASE STRATEGIES</td>
+      <td>CHASE COMMUNICATIONS</td>
+      <td>1900 M ST NW|||WASHINGTON|DC|20036-3508|US</td>
+      <td>c4c2be73ce02655af186a62d159e36958fcfb726dfc7adaf561564dc1196568d</td>
+      <td>21-3808741</td>
+      <td>213808741</td>
+      <td>CHASE STRATEGIES</td>
+      <td>CHASE COMMUNICATIONS</td>
+      <td>1900 M ST NW</td>
+      <td></td>
+      <td>WASHINGTON</td>
+      <td>DC</td>
+      <td>20036-3508</td>
+      <td>US</td>
+      <td>1900 M ST NW, WASHINGTON, DC, 20036-3508, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03018802</td>
+      <td>34606530</td>
+      <td>MULLANEY CONST</td>
+      <td>MULLANEY FC</td>
+      <td>14 WRIGHT RD|||DERRY|NH|03038-4935|US</td>
+      <td>2966a10a4f4f68658df7fc729ddcdb9c8756feb6710a7773600c70815f3ea75d</td>
+      <td>03-4606530</td>
+      <td>034606530</td>
+      <td>MULLANEY CONST</td>
+      <td>MULLANEY FC</td>
+      <td>14 WRIGHT RD</td>
+      <td></td>
+      <td>DERRY</td>
+      <td>NH</td>
+      <td>03038-4935</td>
+      <td>US</td>
+      <td>14 WRIGHT RD, DERRY, NH, 03038-4935, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02993576</td>
+      <td>37269688</td>
+      <td>DEMERS CLEANING CO</td>
+      <td>ROLAND DEMERS</td>
+      <td>77 WEST ST|||FOXBORO|MA|02035-2731|US</td>
+      <td>5d37b0f1660a883e1c5caacd2145b73f2735210a194bde697dbd23b3e0d9343e</td>
+      <td>03-7269688</td>
+      <td>037269688</td>
+      <td>DEMERS CLEANING CO</td>
+      <td>ROLAND DEMERS</td>
+      <td>77 WEST ST</td>
+      <td></td>
+      <td>FOXBORO</td>
+      <td>MA</td>
+      <td>02035-2731</td>
+      <td>US</td>
+      <td>77 WEST ST, FOXBORO, MA, 02035-2731, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02971896</td>
+      <td>409806011</td>
+      <td>SATELLITE DRY CLRS</td>
+      <td>LARRY HARVILLE</td>
+      <td>PO BOX 1092|||ELYRIA|OH|44036-1092|US</td>
+      <td>82901fa9d3d55ffb69ce03550ff95d34a00fe00e9961fb9f6791d444b5f1c406</td>
+      <td>40-9806011</td>
+      <td>409806011</td>
+      <td>SATELLITE DRY CLRS</td>
+      <td>LARRY HARVILLE</td>
+      <td>PO BOX 1092</td>
+      <td></td>
+      <td>ELYRIA</td>
+      <td>OH</td>
+      <td>44036-1092</td>
+      <td>US</td>
+      <td>PO BOX 1092, ELYRIA, OH, 44036-1092, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04479982</td>
+      <td>423601546</td>
+      <td>SAMFORD CAPITAL CORP</td>
+      <td>LLS DESIGN LLC</td>
+      <td>182 HIDDEN COVE DR|||RICHMOND HILL|GA|31324-4971|US</td>
+      <td>4515903c70281373a8ab8fa98ad009e97c0a0f5013644d355ff0514c1c011094</td>
+      <td>42-3601546</td>
+      <td>423601546</td>
+      <td>SAMFORD CAPITAL CORP</td>
+      <td>LLS DESIGN LLC</td>
+      <td>182 HIDDEN COVE DR</td>
+      <td></td>
+      <td>RICHMOND HILL</td>
+      <td>GA</td>
+      <td>31324-4971</td>
+      <td>US</td>
+      <td>182 HIDDEN COVE DR, RICHMOND HILL, GA, 31324-4971, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03132814</td>
+      <td>377720070</td>
+      <td>LAUER PEST CONTROL INC</td>
+      <td>LAUER PEST CONTROL</td>
+      <td>1152 MCBRIDE PARK DR|||HARBOR SPRINGS|MI|49740-9508|US</td>
+      <td>f965b17efb1f47986b1c79741281d9d164d76f47e422c8dd89a00642213f79de</td>
+      <td>37-7720070</td>
+      <td>377720070</td>
+      <td>LAUER PEST CONTROL INC</td>
+      <td>LAUER PEST CONTROL</td>
+      <td>1152 MCBRIDE PARK DR</td>
+      <td></td>
+      <td>HARBOR SPRINGS</td>
+      <td>MI</td>
+      <td>49740-9508</td>
+      <td>US</td>
+      <td>1152 MCBRIDE PARK DR, HARBOR SPRINGS, MI, 49740-9508, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03754969</td>
+      <td>620243059</td>
+      <td>CASA BLANCA REST</td>
+      <td>JUAN C DE LEON</td>
+      <td>66370 PIERSON BLVD|||DSRT HOT SPGS|CA|92240-3658|US</td>
+      <td>97eeb551bb1147fbb8748d9a389ae31cfe8c7cb5602feba1eaa0e0fe8a7556c0</td>
+      <td>62-0243059</td>
+      <td>620243059</td>
+      <td>CASA BLANCA REST</td>
+      <td>JUAN C DE LEON</td>
+      <td>66370 PIERSON BLVD</td>
+      <td></td>
+      <td>DSRT HOT SPGS</td>
+      <td>CA</td>
+      <td>92240-3658</td>
+      <td>US</td>
+      <td>66370 PIERSON BLVD, DSRT HOT SPGS, CA, 92240-3658, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04541372</td>
+      <td>507548042</td>
+      <td>KEMMY CONSULTING</td>
+      <td>ROBERT P KEMMY</td>
+      <td>5727 PANDALE|||SAN ANTONIO|TX|78261-2628|US</td>
+      <td>75ad932aabff740a28589eec0ac8576b1e1876fcd2f63fd1c86234202bc6158b</td>
+      <td>50-7548042</td>
+      <td>507548042</td>
+      <td>KEMMY CONSULTING</td>
+      <td>ROBERT P KEMMY</td>
+      <td>5727 PANDALE</td>
+      <td></td>
+      <td>SAN ANTONIO</td>
+      <td>TX</td>
+      <td>78261-2628</td>
+      <td>US</td>
+      <td>5727 PANDALE, SAN ANTONIO, TX, 78261-2628, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04494372</td>
+      <td>403643147</td>
+      <td>SIMON AND ASSOCIATES</td>
+      <td>NaN</td>
+      <td>2905 FALMOUTH DR|||LOUISVILLE|KY|40205-2805|US</td>
+      <td>6c962f6400d2c5b09dd3be6c129166175267e34163e80121619d25853866ba39</td>
+      <td>40-3643147</td>
+      <td>403643147</td>
+      <td>SIMON AND ASSOCIATES</td>
+      <td>NaN</td>
+      <td>2905 FALMOUTH DR</td>
+      <td></td>
+      <td>LOUISVILLE</td>
+      <td>KY</td>
+      <td>40205-2805</td>
+      <td>US</td>
+      <td>2905 FALMOUTH DR, LOUISVILLE, KY, 40205-2805, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04229139</td>
+      <td>403643147</td>
+      <td>SIMON AND ASSOCIATES</td>
+      <td>NaN</td>
+      <td>PMB 175|||LOUISVILLE|KY|40205|US</td>
+      <td>1ea7a95997e043af5512fadcba5662a7df9738e0a4f7f7ef01535ace9ce2b902</td>
+      <td>40-3643147</td>
+      <td>403643147</td>
+      <td>SIMON AND ASSOCIATES</td>
+      <td>NaN</td>
+      <td>PMB 175</td>
+      <td></td>
+      <td>LOUISVILLE</td>
+      <td>KY</td>
+      <td>40205</td>
+      <td>US</td>
+      <td>PMB 175, LOUISVILLE, KY, 40205, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04495184</td>
+      <td>116425020</td>
+      <td>VAN BUREN CONTRACTRS</td>
+      <td>CURTIS VAN BUREN</td>
+      <td>1780 DUNK HILL RD|||WALTON|NY|13856-3281|US</td>
+      <td>ee34dd9c765355cc4db3762f428a1221d404d6bfaa0a9f92ebc9b335a19beba7</td>
+      <td>11-6425020</td>
+      <td>116425020</td>
+      <td>VAN BUREN CONTRACTRS</td>
+      <td>CURTIS VAN BUREN</td>
+      <td>1780 DUNK HILL RD</td>
+      <td></td>
+      <td>WALTON</td>
+      <td>NY</td>
+      <td>13856-3281</td>
+      <td>US</td>
+      <td>1780 DUNK HILL RD, WALTON, NY, 13856-3281, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04924393</td>
+      <td>549067399</td>
+      <td>BUCHANAN COMPANY LLC</td>
+      <td>NaN</td>
+      <td>8291 ANDALUSIAN DR|||SACRAMENTO|CA|95829-6519|US</td>
+      <td>c98ec6c7ee9e54930bd85f1994e86ee8f7e1cfdf164974ebb50c5230a99bcfda</td>
+      <td>54-9067399</td>
+      <td>549067399</td>
+      <td>BUCHANAN COMPANY LLC</td>
+      <td>NaN</td>
+      <td>8291 ANDALUSIAN DR</td>
+      <td></td>
+      <td>SACRAMENTO</td>
+      <td>CA</td>
+      <td>95829-6519</td>
+      <td>US</td>
+      <td>8291 ANDALUSIAN DR, SACRAMENTO, CA, 95829-6519, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04269642</td>
+      <td>162462897</td>
+      <td>CONTRACT CONTROL INC</td>
+      <td>PETER ERIC FORSBERG</td>
+      <td>124 1/2 S MAIN ST|||GRANVILLE|OH|43023-1409|US</td>
+      <td>fc60883ccd11bb0b9ca39f452f3e4c0b97c1cd5e7332a3c3512200dd88af1499</td>
+      <td>16-2462897</td>
+      <td>162462897</td>
+      <td>CONTRACT CONTROL INC</td>
+      <td>PETER ERIC FORSBERG</td>
+      <td>124 1/2 S MAIN ST</td>
+      <td></td>
+      <td>GRANVILLE</td>
+      <td>OH</td>
+      <td>43023-1409</td>
+      <td>US</td>
+      <td>124 1/2 S MAIN ST, GRANVILLE, OH, 43023-1409, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01730949</td>
+      <td>529486396</td>
+      <td>ANTHONY MITCHELL PHD</td>
+      <td>NaN</td>
+      <td>533 BAYWOOD DR S|||DUNEDIN|FL|34698-2012|US</td>
+      <td>38f7f508482fa025c8f4f1c47a83df020ae836db25008be914aee2cc84baefeb</td>
+      <td>52-9486396</td>
+      <td>529486396</td>
+      <td>ANTHONY MITCHELL PHD</td>
+      <td>NaN</td>
+      <td>533 BAYWOOD DR S</td>
+      <td></td>
+      <td>DUNEDIN</td>
+      <td>FL</td>
+      <td>34698-2012</td>
+      <td>US</td>
+      <td>533 BAYWOOD DR S, DUNEDIN, FL, 34698-2012, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01744038</td>
+      <td>551866751</td>
+      <td>CAROLINE BAKER INT</td>
+      <td>CAROLINE BAKER INT.</td>
+      <td>8118 BUENA FORTUNA ST|||CARPINTERIA|CA|93013-3200|US</td>
+      <td>3a56afb99e081b96ca1761825d025762bf5893b9a342067f7ff0f3753b2cdb49</td>
+      <td>55-1866751</td>
+      <td>551866751</td>
+      <td>CAROLINE BAKER INT</td>
+      <td>CAROLINE BAKER INT.</td>
+      <td>8118 BUENA FORTUNA ST</td>
+      <td></td>
+      <td>CARPINTERIA</td>
+      <td>CA</td>
+      <td>93013-3200</td>
+      <td>US</td>
+      <td>8118 BUENA FORTUNA ST, CARPINTERIA, CA, 93013-3200, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>02133160_AXP</td>
+      <td>426964664</td>
+      <td>COLE SPENCER &amp; ASSOCIATES</td>
+      <td>COLE SPENCER &amp; ASSOC</td>
+      <td>316 GLEN COVE RD|||BRANDON|MS|39047-6340|US</td>
+      <td>1943604dd965134e5c8f553e78f84b89f7cd60e543e776307dce941af9143251</td>
+      <td>42-6964664</td>
+      <td>426964664</td>
+      <td>COLE SPENCER &amp; ASSOCIATES</td>
+      <td>COLE SPENCER &amp; ASSOC</td>
+      <td>316 GLEN COVE RD</td>
+      <td></td>
+      <td>BRANDON</td>
+      <td>MS</td>
+      <td>39047-6340</td>
+      <td>US</td>
+      <td>316 GLEN COVE RD, BRANDON, MS, 39047-6340, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>01859258_AXP</td>
+      <td>832815059</td>
+      <td>CLOUDS HOOKAH SPORTS GRILL</td>
+      <td>CLOUDS HOOKAH SPORTS</td>
+      <td>1617 UNIVERSITY AVE UNIT B|||LUBBOCK|TX|79401-4417|US</td>
+      <td>f445c38838e02a20155d61f9f9cd9ad3173d3813ed2f810bdd448b66e61cc193</td>
+      <td>83-2815059</td>
+      <td>832815059</td>
+      <td>CLOUDS HOOKAH SPORTS GRILL</td>
+      <td>CLOUDS HOOKAH SPORTS</td>
+      <td>1617 UNIVERSITY AVE UNIT B</td>
+      <td></td>
+      <td>LUBBOCK</td>
+      <td>TX</td>
+      <td>79401-4417</td>
+      <td>US</td>
+      <td>1617 UNIVERSITY AVE UNIT B, LUBBOCK, TX, 79401-4417, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01784597</td>
+      <td>347700883</td>
+      <td>POLTEX TILE INC</td>
+      <td>THE GRANITE SHOP</td>
+      <td>500 BENNETT LN|||LEWISVILLE|TX|75057-4806|US</td>
+      <td>a86adfc4281f54ffff55c7f0ef6084e778f2052e4a6b143b3560af93a0495937</td>
+      <td>34-7700883</td>
+      <td>347700883</td>
+      <td>POLTEX TILE INC</td>
+      <td>THE GRANITE SHOP</td>
+      <td>500 BENNETT LN</td>
+      <td></td>
+      <td>LEWISVILLE</td>
+      <td>TX</td>
+      <td>75057-4806</td>
+      <td>US</td>
+      <td>500 BENNETT LN, LEWISVILLE, TX, 75057-4806, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04556893</td>
+      <td>126406709</td>
+      <td>PENELOPE PASTIS PHD</td>
+      <td>PENELOPE PATSIS PHD</td>
+      <td>5 SOUNDCREST LN|||LLOYD HARBOR|NY|11743-9790|US</td>
+      <td>4a37bf2520dd79e0b3ce165b00458b7dd835b045ea696835ad4c183868048131</td>
+      <td>12-6406709</td>
+      <td>126406709</td>
+      <td>PENELOPE PASTIS PHD</td>
+      <td>PENELOPE PATSIS PHD</td>
+      <td>5 SOUNDCREST LN</td>
+      <td></td>
+      <td>LLOYD HARBOR</td>
+      <td>NY</td>
+      <td>11743-9790</td>
+      <td>US</td>
+      <td>5 SOUNDCREST LN, LLOYD HARBOR, NY, 11743-9790, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02016348</td>
+      <td>570613847</td>
+      <td>KRISH REFRIGERATION</td>
+      <td>NaN</td>
+      <td>3006 SAN ANGELO AVE|||SIMI VALLEY|CA|93063-1927|US</td>
+      <td>12199a9706a146e76d3af5a23a03bfe27bf9a208bb6b2b565972b3a37abcc44f</td>
+      <td>57-0613847</td>
+      <td>570613847</td>
+      <td>KRISH REFRIGERATION</td>
+      <td>NaN</td>
+      <td></td>
+      <td></td>
+      <td>SIMI VALLEY</td>
+      <td>CA</td>
+      <td>93063-1927</td>
+      <td>US</td>
+      <td>SIMI VALLEY, CA, 93063-1927, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03385725</td>
+      <td>429862557</td>
+      <td>RON PACK CARPET CTR</td>
+      <td>JAMES D OWENS</td>
+      <td>35 INVERNESS CIR|||LITTLE ROCK|AR|72212-2905|US</td>
+      <td>4a2a16a3c39532f4c9e4b9fe28cff3df09a07dc14a605a77fcf76d65a791deee</td>
+      <td>42-9862557</td>
+      <td>429862557</td>
+      <td>RON PACK CARPET CTR</td>
+      <td>JAMES D OWENS</td>
+      <td>35 INVERNESS CIR</td>
+      <td></td>
+      <td>LITTLE ROCK</td>
+      <td>AR</td>
+      <td>72212-2905</td>
+      <td>US</td>
+      <td>35 INVERNESS CIR, LITTLE ROCK, AR, 72212-2905, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04485849</td>
+      <td>345426613</td>
+      <td>RELEAF DAY SPA</td>
+      <td>POLLY RYAN</td>
+      <td>403 S BRYAN CIR|||BRANDON|FL|33511-6034|US</td>
+      <td>9500ac0784319d54efb5dac9c4a2f35593154a394e73cebdb4fc77c5ba911c6c</td>
+      <td>34-5426613</td>
+      <td>345426613</td>
+      <td>RELEAF DAY SPA</td>
+      <td>POLLY RYAN</td>
+      <td>403 S BRYAN CIR</td>
+      <td></td>
+      <td>BRANDON</td>
+      <td>FL</td>
+      <td>33511-6034</td>
+      <td>US</td>
+      <td>403 S BRYAN CIR, BRANDON, FL, 33511-6034, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03708686</td>
+      <td>603228135</td>
+      <td>KEYSTONE CM</td>
+      <td>ILYA VEYTS INC</td>
+      <td>4240 FULTON AVE|UNIT 110||STUDIO CITY|CA|91604-1803|US</td>
+      <td>b1211e96f82a0e6ddc078f110fbfdd66dfaed93bddcd6b6be7d07431498020e4</td>
+      <td>60-3228135</td>
+      <td>603228135</td>
+      <td>KEYSTONE CM</td>
+      <td>ILYA VEYTS INC</td>
+      <td>4240 FULTON AVE</td>
+      <td>UNIT 110</td>
+      <td>STUDIO CITY</td>
+      <td>CA</td>
+      <td>91604-1803</td>
+      <td>US</td>
+      <td>4240 FULTON AVE, UNIT 110, STUDIO CITY, CA, 91604-1803, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02948564</td>
+      <td>547596182</td>
+      <td>ALPANIAN DESIGN GROUP</td>
+      <td>ALPANIAN DESIGN GRP</td>
+      <td>22733 CALVERT ST|||WOODLAND HILLS|CA|91367-3202|US</td>
+      <td>dab57299012c7c12def176855a8cb4541aacd8b6eaf1c21114ba987c60a27f1c</td>
+      <td>54-7596182</td>
+      <td>547596182</td>
+      <td>ALPANIAN DESIGN GROUP</td>
+      <td>ALPANIAN DESIGN GRP</td>
+      <td>22733 CALVERT ST</td>
+      <td></td>
+      <td>WOODLAND HILLS</td>
+      <td>CA</td>
+      <td>91367-3202</td>
+      <td>US</td>
+      <td>22733 CALVERT ST, WOODLAND HILLS, CA, 91367-3202, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03735409</td>
+      <td>381443158</td>
+      <td>SUSAN E PALETZ PLLC</td>
+      <td>NaN</td>
+      <td>32732 OLDE FRANKLIN DR|||FARMINGTON HILLS|MI|48334-1746|US</td>
+      <td>c7d6e1f3d64b753f8a717f9b24e77cfc28eefd63a9e65c06bc34a08b0675c130</td>
+      <td>38-1443158</td>
+      <td>381443158</td>
+      <td>SUSAN E PALETZ PLLC</td>
+      <td>NaN</td>
+      <td>32732 OLDE FRANKLIN DR</td>
+      <td></td>
+      <td>FARMINGTON HILLS</td>
+      <td>MI</td>
+      <td>48334-1746</td>
+      <td>US</td>
+      <td>32732 OLDE FRANKLIN DR, FARMINGTON HILLS, MI, 48334-1746, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04999930</td>
+      <td>590704838</td>
+      <td>ROALD SKOGLUND</td>
+      <td>NaN</td>
+      <td>12381 SW LAGUNA REEF DR|||PORT SAINT LUCIE|FL|34987-6934|US</td>
+      <td>d8841037d08d78f13b415bef000e7d1e1451d11aa4c024bd94a5231146dc418b</td>
+      <td>59-0704838</td>
+      <td>590704838</td>
+      <td>ROALD SKOGLUND</td>
+      <td>NaN</td>
+      <td>12381 SW LAGUNA REEF DR</td>
+      <td></td>
+      <td>PORT SAINT LUCIE</td>
+      <td>FL</td>
+      <td>34987-6934</td>
+      <td>US</td>
+      <td>12381 SW LAGUNA REEF DR, PORT SAINT LUCIE, FL, 34987-6934, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04581157</td>
+      <td>119364426</td>
+      <td>BOYD GROUP INTL</td>
+      <td>NaN</td>
+      <td>2922 EVERGREEN PKWY|STE 325||EVERGREEN|CO|80439-7915|US</td>
+      <td>d68df82c979011246ca4d3a4ec475ba7d01bbcf4e78c9ebf07582c974ed92fc8</td>
+      <td>11-9364426</td>
+      <td>119364426</td>
+      <td>BOYD GROUP INTL</td>
+      <td>NaN</td>
+      <td>2922 EVERGREEN PKWY</td>
+      <td>STE 325</td>
+      <td>EVERGREEN</td>
+      <td>CO</td>
+      <td>80439-7915</td>
+      <td>US</td>
+      <td>2922 EVERGREEN PKWY, STE 325, EVERGREEN, CO, 80439-7915, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04496735</td>
+      <td>451083325</td>
+      <td>BELLINGHAUSEN &amp; ASSOC</td>
+      <td>JKB ALLIANCE</td>
+      <td>801 E CAMPBELL RD STE 585|||RICHARDSON|TX|75081-1866|US</td>
+      <td>d86dbcc59e7ebaa797e1be03b7f540271fcc97bd22875720d8746eb4d8274035</td>
+      <td>45-1083325</td>
+      <td>451083325</td>
+      <td>BELLINGHAUSEN &amp; ASSOC</td>
+      <td>JKB ALLIANCE</td>
+      <td>801 E CAMPBELL RD STE 585</td>
+      <td></td>
+      <td>RICHARDSON</td>
+      <td>TX</td>
+      <td>75081-1866</td>
+      <td>US</td>
+      <td>801 E CAMPBELL RD STE 585, RICHARDSON, TX, 75081-1866, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02942672</td>
+      <td>109449779</td>
+      <td>ADDEO JEWELERS LLC</td>
+      <td>ADDEO JEWELERS</td>
+      <td>1288 GLENCREST DR|||HEATHROW|FL|32746-5025|US</td>
+      <td>391074c4ac5334870e66a40cfbe563b541d912e08a6f814c430f9fca999a5c65</td>
+      <td>10-9449779</td>
+      <td>109449779</td>
+      <td>ADDEO JEWELERS LLC</td>
+      <td>ADDEO JEWELERS</td>
+      <td>1288 GLENCREST DR</td>
+      <td></td>
+      <td>HEATHROW</td>
+      <td>FL</td>
+      <td>32746-5025</td>
+      <td>US</td>
+      <td>1288 GLENCREST DR, HEATHROW, FL, 32746-5025, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03473030</td>
+      <td>367725059</td>
+      <td>DAN SAFERSTEIN PHD</td>
+      <td>NaN</td>
+      <td>122 S MAIN ST|STE 300||ANN ARBOR|MI|48104-1925|US</td>
+      <td>95967c3bd4180159875cb1ee1bb05d9decdfcf8cb31a0f885cd89f8cc847db78</td>
+      <td>36-7725059</td>
+      <td>367725059</td>
+      <td>DAN SAFERSTEIN PHD</td>
+      <td>NaN</td>
+      <td>122 S MAIN ST</td>
+      <td>STE 300</td>
+      <td>ANN ARBOR</td>
+      <td>MI</td>
+      <td>48104-1925</td>
+      <td>US</td>
+      <td>122 S MAIN ST, STE 300, ANN ARBOR, MI, 48104-1925, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03752786</td>
+      <td>530342681</td>
+      <td>CLARK ELECTRIC</td>
+      <td>CLARK ELECTRIC</td>
+      <td>432 N 250 E|||KANAB|UT|84741-3323|US</td>
+      <td>b2068c3a317202198069efe2d3d40200feaaede5b829b6f788e5a3df68baaf56</td>
+      <td>53-0342681</td>
+      <td>530342681</td>
+      <td>CLARK ELECTRIC</td>
+      <td>CLARK ELECTRIC</td>
+      <td>432 N 250 E</td>
+      <td></td>
+      <td>KANAB</td>
+      <td>UT</td>
+      <td>84741-3323</td>
+      <td>US</td>
+      <td>432 N 250 E, KANAB, UT, 84741-3323, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04916653</td>
+      <td>568430021</td>
+      <td>WALBERG DESIGN</td>
+      <td>WALBERG DESIGN</td>
+      <td>1916 NW 65TH ST|||SEATTLE|WA|98117-5712|US</td>
+      <td>cc858d0efdb60645166bf9b0abb499dad4f18a367091889b93c33a3e70be375b</td>
+      <td>56-8430021</td>
+      <td>568430021</td>
+      <td>WALBERG DESIGN</td>
+      <td>WALBERG DESIGN</td>
+      <td>1916 NW 65TH ST</td>
+      <td></td>
+      <td>SEATTLE</td>
+      <td>WA</td>
+      <td>98117-5712</td>
+      <td>US</td>
+      <td>1916 NW 65TH ST, SEATTLE, WA, 98117-5712, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01769457</td>
+      <td>376648752</td>
+      <td>D. OSGOOD CPA</td>
+      <td>D. OSGOOD CPA</td>
+      <td>2233 SEMINOLE RD|APT 7||ATLANTIC BEACH|FL|32233-5904|US</td>
+      <td>597dd0136d969dde8666c3e5bbb6532ea8360710a2b72269977867d21c656eeb</td>
+      <td>37-6648752</td>
+      <td>376648752</td>
+      <td>D. OSGOOD CPA</td>
+      <td>D. OSGOOD CPA</td>
+      <td>2233 SEMINOLE RD</td>
+      <td>APT 7</td>
+      <td>ATLANTIC BEACH</td>
+      <td>FL</td>
+      <td>32233-5904</td>
+      <td>US</td>
+      <td>2233 SEMINOLE RD, APT 7, ATLANTIC BEACH, FL, 32233-5904, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04808065</td>
+      <td>242824854</td>
+      <td>DENNY WAGONER CONST</td>
+      <td>DENNY WAGONER CONST</td>
+      <td>48138 WESLEY CHAPEL RD|||RICHFIELD|NC|28137-5777|US</td>
+      <td>b74e3b111ff271492705e5b8899ced80fda998c1667d24edbda2c8005f082ffa</td>
+      <td>24-2824854</td>
+      <td>242824854</td>
+      <td>DENNY WAGONER CONST</td>
+      <td>DENNY WAGONER CONST</td>
+      <td>48138 WESLEY CHAPEL RD</td>
+      <td></td>
+      <td>RICHFIELD</td>
+      <td>NC</td>
+      <td>28137-5777</td>
+      <td>US</td>
+      <td>48138 WESLEY CHAPEL RD, RICHFIELD, NC, 28137-5777, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04209492</td>
+      <td>49684223</td>
+      <td>PLONOWSKI BLDNG</td>
+      <td>PLONOWSKI BLDNG</td>
+      <td>2 HERITAGE HILL RD|||NORWALK|CT|06851-1712|US</td>
+      <td>0367f53160f725dba08fec513ba0a803a85ee3cb986b03026f38c181d8328762</td>
+      <td>04-9684223</td>
+      <td>049684223</td>
+      <td>PLONOWSKI BLDNG</td>
+      <td>PLONOWSKI BLDNG</td>
+      <td>2 HERITAGE HILL RD</td>
+      <td></td>
+      <td>NORWALK</td>
+      <td>CT</td>
+      <td>06851-1712</td>
+      <td>US</td>
+      <td>2 HERITAGE HILL RD, NORWALK, CT, 06851-1712, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02783926</td>
+      <td>22602554</td>
+      <td>CONSIDINE STUDIOS</td>
+      <td>CONSIDINE STUDIOS</td>
+      <td>751B MAPLE AVE|||LANSDALE|PA|19446-1846|US</td>
+      <td>c31515b0d79e16d281f3f6b5bc5d0783dcaf642b76d74e2909203a9431ee2996</td>
+      <td>02-2602554</td>
+      <td>022602554</td>
+      <td>CONSIDINE STUDIOS</td>
+      <td>CONSIDINE STUDIOS</td>
+      <td>751B MAPLE AVE</td>
+      <td></td>
+      <td>LANSDALE</td>
+      <td>PA</td>
+      <td>19446-1846</td>
+      <td>US</td>
+      <td>751B MAPLE AVE, LANSDALE, PA, 19446-1846, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02814578</td>
+      <td>249272633</td>
+      <td>HESTIR ENVIRONMENTAL</td>
+      <td>HESTIR ENVIRONMENTAL</td>
+      <td>131 MARTIN CIR|||CENTRAL|SC|29630-9476|US</td>
+      <td>1f15007ba99e16233435de3abf9f3e9022ad399b5b6a335b6d06728574341b6d</td>
+      <td>24-9272633</td>
+      <td>249272633</td>
+      <td>HESTIR ENVIRONMENTAL</td>
+      <td>HESTIR ENVIRONMENTAL</td>
+      <td>131 MARTIN CIR</td>
+      <td></td>
+      <td>CENTRAL</td>
+      <td>SC</td>
+      <td>29630-9476</td>
+      <td>US</td>
+      <td>131 MARTIN CIR, CENTRAL, SC, 29630-9476, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP01740936</td>
+      <td>555613635</td>
+      <td>KAYVAN SETAREH</td>
+      <td>KAYVAN SETAREH</td>
+      <td>501 AMALFI DR PACIFC 501 AMALFI DR PACIFC|||PACIFIC PALISADES|CA|90272-4504|US</td>
+      <td>d09ff132cee0ebc843718d56b06fc1a9dee1de9d3c1e88f35905a88b5ae7426f</td>
+      <td>55-5613635</td>
+      <td>555613635</td>
+      <td>KAYVAN SETAREH</td>
+      <td>KAYVAN SETAREH</td>
+      <td>501 AMALFI DR PACIFC 501 AMALFI DR PACIFC</td>
+      <td></td>
+      <td>PACIFIC PALISADES</td>
+      <td>CA</td>
+      <td>90272-4504</td>
+      <td>US</td>
+      <td>501 AMALFI DR PACIFC 501 AMALFI DR PACIFC, PACIFIC PALISADES, CA, 90272-4504, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03753490</td>
+      <td>347346773</td>
+      <td>ROBERT K UDZIELA</td>
+      <td>ROBERT K UDZIELA</td>
+      <td>8640 SW CORTEZ CT|||BEAVERTON|OR|97008-7272|US</td>
+      <td>6382b761fb48b13cdcc1426b72f440df3f910e4a525b8eaa0f880f62b6ffb662</td>
+      <td>34-7346773</td>
+      <td>347346773</td>
+      <td>ROBERT K UDZIELA</td>
+      <td>ROBERT K UDZIELA</td>
+      <td>8640 SW CORTEZ CT</td>
+      <td></td>
+      <td>BEAVERTON</td>
+      <td>OR</td>
+      <td>97008-7272</td>
+      <td>US</td>
+      <td>8640 SW CORTEZ CT, BEAVERTON, OR, 97008-7272, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP02955114</td>
+      <td>138780385</td>
+      <td>ANNA POLLATOS DMD</td>
+      <td>ANNA POLLATOS DMD</td>
+      <td>710 EASTON AVE|||SOMERSET|NJ|08873-1855|US</td>
+      <td>d16858f82bdec3922161f0714d5691448e73f9134b18c040d9e2149f8680ebb3</td>
+      <td>13-8780385</td>
+      <td>138780385</td>
+      <td>ANNA POLLATOS DMD</td>
+      <td>ANNA POLLATOS DMD</td>
+      <td>710 EASTON AVE</td>
+      <td></td>
+      <td>SOMERSET</td>
+      <td>NJ</td>
+      <td>08873-1855</td>
+      <td>US</td>
+      <td>710 EASTON AVE, SOMERSET, NJ, 08873-1855, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03134321</td>
+      <td>430020464</td>
+      <td>GRIFFIN FUNERAL HOME</td>
+      <td>GRIFFIN FUNERAL HOME</td>
+      <td>109 BRASFIELD ST|||DUMAS|AR|71639-2313|US</td>
+      <td>461d59a7fde50a48c10edae68cb8c48521e796c0f7cd41174f7c028e6ab9de12</td>
+      <td>43-0020464</td>
+      <td>430020464</td>
+      <td>GRIFFIN FUNERAL HOME</td>
+      <td>GRIFFIN FUNERAL HOME</td>
+      <td>109 BRASFIELD ST</td>
+      <td></td>
+      <td>DUMAS</td>
+      <td>AR</td>
+      <td>71639-2313</td>
+      <td>US</td>
+      <td>109 BRASFIELD ST, DUMAS, AR, 71639-2313, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>02133613_AXP</td>
+      <td>149408148</td>
+      <td>ROBINSON INTERIORS</td>
+      <td>ROBINSON INTERIORS</td>
+      <td>3953 ROBERTS POINT RD|||SIESTA KEY|FL|34242-1160|US</td>
+      <td>7764da30af8c31b2aacce535bcf331d650774a28556f9e80a34079c09ad9c199</td>
+      <td>14-9408148</td>
+      <td>149408148</td>
+      <td>ROBINSON INTERIORS</td>
+      <td>ROBINSON INTERIORS</td>
+      <td>3953 ROBERTS POINT RD</td>
+      <td></td>
+      <td>SIESTA KEY</td>
+      <td>FL</td>
+      <td>34242-1160</td>
+      <td>US</td>
+      <td>3953 ROBERTS POINT RD, SIESTA KEY, FL, 34242-1160, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04748586</td>
+      <td>248356047</td>
+      <td>DAVIS TRANSPORT SYS</td>
+      <td>DAVIS TRANSPORT SYS</td>
+      <td>537 ARCOLA DR|||COLUMBIA|SC|29223-5406|US</td>
+      <td>4aedff788da48f6da7a6f1f761cae5142bcd7129e1c3a2aa8437657e58e17a2c</td>
+      <td>24-8356047</td>
+      <td>248356047</td>
+      <td>DAVIS TRANSPORT SYS</td>
+      <td>DAVIS TRANSPORT SYS</td>
+      <td>537 ARCOLA DR</td>
+      <td></td>
+      <td>COLUMBIA</td>
+      <td>SC</td>
+      <td>29223-5406</td>
+      <td>US</td>
+      <td>537 ARCOLA DR, COLUMBIA, SC, 29223-5406, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP03243734</td>
+      <td>386601089</td>
+      <td>HAYES 2 EXEC TRANS</td>
+      <td>HAYES 2 EXEC TRANS</td>
+      <td>821 W LYNN CREEK DR|||ARLINGTON|TX|76001-7523|US</td>
+      <td>d0e45243f31996af7735d3a5a618486c0d870ba2d5d612bdf93e3a2c337d74c6</td>
+      <td>38-6601089</td>
+      <td>386601089</td>
+      <td>HAYES 2 EXEC TRANS</td>
+      <td>HAYES 2 EXEC TRANS</td>
+      <td>821 W LYNN CREEK DR</td>
+      <td></td>
+      <td>ARLINGTON</td>
+      <td>TX</td>
+      <td>76001-7523</td>
+      <td>US</td>
+      <td>821 W LYNN CREEK DR, ARLINGTON, TX, 76001-7523, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04420306</td>
+      <td>389729683</td>
+      <td>MCKEETH LLC</td>
+      <td>MCKEETH LLC</td>
+      <td>106 CLAY ST|||WOODSTOCK|GA|30188-4802|US</td>
+      <td>5c803a34625b10c4873472563e259bad024d8f4a32664bff2e10415bbeb39619</td>
+      <td>38-9729683</td>
+      <td>389729683</td>
+      <td>MCKEETH LLC</td>
+      <td>MCKEETH LLC</td>
+      <td>106 CLAY ST</td>
+      <td></td>
+      <td>WOODSTOCK</td>
+      <td>GA</td>
+      <td>30188-4802</td>
+      <td>US</td>
+      <td>106 CLAY ST, WOODSTOCK, GA, 30188-4802, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+    <tr>
+      <td>AXP04919815</td>
+      <td>553962215</td>
+      <td>SEDILLO COMPANY INC</td>
+      <td>SEDILLO COMPANY INC</td>
+      <td>425 CITADEL DR|||DAVIS|CA|95616-1006|US</td>
+      <td>8d8ed0305e1306ec2811236d288480d75426aa69549822a5ee0fe64eb1bf5ccf</td>
+      <td>55-3962215</td>
+      <td>553962215</td>
+      <td>SEDILLO COMPANY INC</td>
+      <td>SEDILLO COMPANY INC</td>
+      <td>425 CITADEL DR</td>
+      <td></td>
+      <td>DAVIS</td>
+      <td>CA</td>
+      <td>95616-1006</td>
+      <td>US</td>
+      <td>425 CITADEL DR, DAVIS, CA, 95616-1006, US</td>
+      <td>NO_DUPLICATE_ISSUE</td>
+      <td>Record is clean and passed structural uniqueness tests.</td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+    
+
+    </div>
+</body>
+</html>
