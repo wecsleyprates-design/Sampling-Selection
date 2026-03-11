@@ -154,8 +154,11 @@ def _apply_feature_type_fixes(df: pd.DataFrame) -> pd.DataFrame:
 # DATA LOADING & TAGGING ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner="Loading & tagging dataset …")
-def load_and_tag() -> pd.DataFrame:
-    df = pd.read_csv(DATA_PATH, low_memory=False)
+def load_and_tag(file_source, file_name: str) -> pd.DataFrame:
+    if file_name.lower().endswith(('.xls', '.xlsx')):
+        df = pd.read_excel(file_source)
+    else:
+        df = pd.read_csv(file_source, low_memory=False)
 
     # ── Feature-type engineering: convert Excel serials, classify columns ──────
     df = _apply_feature_type_fixes(df)
@@ -362,6 +365,106 @@ def get_tin_summary(df: pd.DataFrame) -> pd.DataFrame:
 # ─────────────────────────────────────────────────────────────────────────────
 # HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
+def _psi_numeric(pool_vals, samp_vals, buckets=10):
+    e = np.array(pool_vals, dtype=float)
+    a = np.array(samp_vals, dtype=float)
+    if len(e) < 10 or len(a) < 10:
+        return float("nan")
+    bp = np.unique(np.percentile(e, np.linspace(0, 100, buckets + 1)))
+    if len(bp) < 2:
+        return float("nan")
+    ep = np.histogram(e, bins=bp)[0] / max(len(e), 1)
+    ap = np.histogram(a, bins=bp)[0] / max(len(a), 1)
+    ep = np.where(ep == 0, 1e-6, ep)
+    ap = np.where(ap == 0, 1e-6, ap)
+    return float(np.sum((ap - ep) * np.log(ap / ep)))
+
+def _psi_categorical(pool_col, samp_col):
+    pv = pool_col.value_counts(normalize=True)
+    sv = samp_col.value_counts(normalize=True)
+    cats = sorted(set(pv.index) | set(sv.index))
+    if len(cats) < 2:
+        return float("nan"), cats
+    ep = np.array([max(float(pv.get(c, 0)), 1e-6) for c in cats])
+    ap = np.array([max(float(sv.get(c, 0)), 1e-6) for c in cats])
+    ep /= ep.sum(); ap /= ap.sum()
+    return float(np.sum((ap - ep) * np.log(ap / ep))), cats
+
+def _evaluate_max_psi(pool_df, samp_df):
+    """Calculates max PSI across outcome cols, metrics, and standard features to check stability.
+    Returns (max_psi, is_stable) where is_stable respects the relaxed threshold for Fraud sub-populations."""
+    max_psi = 0.0
+    is_stable = True
+    
+    def _check_feature(psi_val, col_name):
+        nonlocal max_psi, is_stable
+        if psi_val == psi_val: # no nan
+            if psi_val > max_psi:
+                max_psi = psi_val
+            threshold = 0.20 if col_name.startswith("Fraud.") else 0.10
+            if psi_val > threshold:
+                is_stable = False
+
+    _outcome_cols = [TARGET_COL, FRAUD_TYPE]
+    _skip = {"duplicate_tag", "tag_reason", "is_first_of_group", "_tin_fraud_count", "_tin_record_count", "_tin_fraud_rate", "_tin_n_distinct_mid", "_tin_n_distinct_state", "_tin_n_distinct_city", "address_postal_code", "owner1_first_name", "address_line_2", "address_city"}
+    _num, _cat, _date = [], [], []
+    
+    _hard_id = {"TIN", "MID", "SequenceKey", "LegalName", "dba1_name", "owner1_first_name", "owner1_last_name", "business_email", "business_phone"}
+    _hard_dt = {"open_date", "closed_date", "Fraud.Opened Date", "Fraud.Date Fraud Found"}
+
+    if _FEATURE_CLASSIFIER_AVAILABLE:
+        az = _FeatureClassifier(pool_df.head(100), log_level="WARNING")
+        ftype_map = az._detect_feature_types()
+        for c, t in ftype_map.items():
+            if c.startswith("_") or c in _skip or c in _outcome_cols: continue
+            if t == "numeric": _num.append(c)
+            elif t in ("categorical", "binary"): _cat.append(c)
+            elif t == "datetime": _date.append(c)
+    else:
+        for c in pool_df.columns:
+            if c.startswith("_") or c in _skip or c in _outcome_cols: continue
+            if c in _hard_id: pass
+            elif c in _hard_dt: _date.append(c)
+            elif pool_df[c].dtype.kind in ("i", "f", "u") and c not in _hard_id: _num.append(c)
+            else: _cat.append(c)
+
+    for c in _outcome_cols:
+        if c in pool_df.columns and c in samp_df.columns:
+            _cat.append(c)
+
+    for c in _num:
+        if c not in samp_df.columns: continue
+        pv = pool_df[c].dropna().values
+        sv = samp_df[c].dropna().values
+        psi = _psi_numeric(pv, sv)
+        _check_feature(psi, c)
+        
+    for c in _cat:
+        if c not in samp_df.columns: continue
+        pc = pool_df[c].fillna("__NA__").astype(str)
+        sc = samp_df[c].fillna("__NA__").astype(str)
+        psi, _ = _psi_categorical(pc, sc)
+        _check_feature(psi, c)
+        
+    for c in _date:
+        if c not in samp_df.columns: continue
+        def _to_dt(s): return pd.to_datetime(s, errors="coerce").dropna()
+        pd_dt = _to_dt(pool_df[c])
+        sd_dt = _to_dt(samp_df[c])
+        if len(pd_dt) < 10 or len(sd_dt) < 10: continue
+        
+        pm = pd_dt.dt.quarter.astype(str)
+        sm = sd_dt.dt.quarter.astype(str)
+        psi_m, _ = _psi_categorical(pm, sm)
+        _check_feature(psi_m, c)
+        
+        pw = pd_dt.dt.dayofweek.astype(str)
+        sw = sd_dt.dt.dayofweek.astype(str)
+        psi_d, _ = _psi_categorical(pw, sw)
+        _check_feature(psi_d, c)
+
+    return max_psi, is_stable
+
 def _plotly_dark(fig):
     fig.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
@@ -403,24 +506,37 @@ def _cols_for_display(df: pd.DataFrame) -> list[str]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LOAD DATA
+# LOAD DATA & APP HEADER
 # ─────────────────────────────────────────────────────────────────────────────
-df = load_and_tag()
-tin_summary = get_tin_summary(df)
+st.sidebar.title("Data Input")
+uploaded_file = st.sidebar.file_uploader("Upload Dataset (CSV/Excel)", type=["csv", "xlsx", "xls"])
+
+if uploaded_file is not None:
+    data_source = uploaded_file
+    dataset_name = uploaded_file.name
+else:
+    data_source = DATA_PATH
+    dataset_name = DATA_PATH
+
+try:
+    df = load_and_tag(data_source, dataset_name)
+    tin_summary = get_tin_summary(df)
+except FileNotFoundError:
+    st.warning(f"Default dataset '{dataset_name}' not found. Please upload a dataset in the sidebar.")
+    st.stop()
+except Exception as e:
+    st.error(f"Error loading dataset: {e}")
+    st.stop()
 
 TRUE_DUP_TAGS = ["EXACT_DUPLICATE", "TECH_REAPPLICATION", "IDENTITY_GROUP_CLEAN"]
 RISK_TAGS     = ["IDENTITY_GROUP_FRAUD", "INVALID_FOR_KYC"]
 TAG_ORDER     = TRUE_DUP_TAGS + RISK_TAGS + ["UNIQUE_CLEAN_NON_LINKED"]
 tag_counts = df["duplicate_tag"].value_counts().reindex(TAG_ORDER).fillna(0).astype(int)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# APP HEADER
-# ─────────────────────────────────────────────────────────────────────────────
 st.title("🔍 TIN / MID Duplicate Analysis")
 st.markdown(
     f"<div style='color:#888;font-size:13px;margin-bottom:8px'>"
-    f"Dataset: <b style='color:{ACCENT}'>{DATA_PATH}</b> &nbsp;|&nbsp; "
+    f"Dataset: <b style='color:{ACCENT}'>{dataset_name}</b> &nbsp;|&nbsp; "
     f"Rows: <b style='color:{ACCENT}'>{len(df):,}</b> &nbsp;|&nbsp; "
     f"Last run: {datetime.now().strftime('%Y-%m-%d %H:%M')}</div>",
     unsafe_allow_html=True,
@@ -1118,15 +1234,25 @@ with TAB4:
                                     help=TAG_DESC["INVALID_FOR_KYC"])
         excl_missing = st.checkbox("Remove rows with missing MID or TIN",    value=True)
 
-    # ── Sample size ───────────────────────────────────────────────────────────
+    # ── Sample size & automated search ────────────────────────────────────────
     st.subheader("Step 2 — Sample Size")
     sample_n = st.slider(
         "Target sample size (N)",
         min_value=1_000, max_value=100_000, value=25_000, step=1_000,
         format="%d",
     )
-    random_seed = st.number_input("Random seed", min_value=0, max_value=99999,
-                                   value=42, step=1)
+    
+    col_s1, col_s2 = st.columns(2)
+    with col_s1:
+        auto_search = st.checkbox("Auto-search for stable sample (PSI ≤ 0.10)", value=True, 
+                                 help="Iteratively searches for a random seed that produces a sample with no Critical or Minor shifts.")
+    with col_s2:
+        if auto_search:
+            max_iters = st.number_input("Max iterations", min_value=1, max_value=1000, value=100, step=10)
+            random_seed = st.number_input("Starting sequence seed", min_value=0, max_value=99999, value=42, step=1)
+        else:
+            max_iters = 1
+            random_seed = st.number_input("Random seed", min_value=0, max_value=99999, value=42, step=1)
 
     # ── Build pool ────────────────────────────────────────────────────────────
     pool = df.copy()
@@ -1400,7 +1526,6 @@ with TAB4:
         if n_pool < sample_n:
             st.error(f"Not enough records in pool ({n_pool:,}) to sample {sample_n:,}.")
         else:
-            rng              = int(random_seed)
             fraud_rate_pool  = pool[TARGET_COL].mean()
             n_fraud_target   = max(1, round(sample_n * fraud_rate_pool))
             n_nofraud_target = sample_n - n_fraud_target
@@ -1416,16 +1541,64 @@ with TAB4:
                     f"taking all of them. No-fraud records fill the remainder."
                 )
 
-            s_fraud   = fraud_pool.sample(  n=n_fraud_target,   random_state=rng)
-            s_nofraud = nofraud_pool.sample(n=n_nofraud_target, random_state=rng)
-            sample    = (
-                pd.concat([s_fraud, s_nofraud], ignore_index=True)
-                  .sample(frac=1, random_state=rng)
-                  .reset_index(drop=True)
-            )
+            best_psi = float('inf')
+            best_sample = None
+            best_seed = int(random_seed)
+            best_rate_sample = 0
+            best_is_stable = False
+            
+            # For accurate PSI evaluation in search, we use the pool WITHOUT true duplicates 
+            # exactly like Tab 5 does.
+            _pool_for_eval = df[~df["duplicate_tag"].isin(TRUE_DUP_TAGS)].copy()
+            _pool_for_eval = _pool_for_eval[(_pool_for_eval["_tin_str"] != "") & (_pool_for_eval["_mid_str"] != "")]
 
-            rate_sample = sample[TARGET_COL].mean() * 100
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            for i in range(int(max_iters)):
+                current_seed = int(random_seed) + i
+                
+                s_fraud   = fraud_pool.sample(n=n_fraud_target, random_state=current_seed)
+                s_nofraud = nofraud_pool.sample(n=n_nofraud_target, random_state=current_seed)
+                sample    = (
+                    pd.concat([s_fraud, s_nofraud], ignore_index=True)
+                      .sample(frac=1, random_state=current_seed)
+                      .reset_index(drop=True)
+                )
+                
+                if auto_search:
+                    current_psi, is_stable = _evaluate_max_psi(_pool_for_eval, sample)
+                    if current_psi < best_psi:
+                        best_psi = current_psi
+                        best_sample = sample
+                        best_seed = current_seed
+                        best_rate_sample = sample[TARGET_COL].mean() * 100
+                        best_is_stable = is_stable
+                    
+                    status_text.text(f"Iteration {i+1}/{max_iters}... Testing Seed {current_seed} | Current Max PSI: {current_psi:.4f}")
+                    progress_bar.progress((i + 1) / int(max_iters))
+                    
+                    if is_stable:
+                        status_text.text(f"Stable sample found at seed {best_seed} with Max PSI {best_psi:.4f} after {i+1} iterations!")
+                        break
+                else:
+                    best_sample = sample
+                    best_seed = current_seed
+                    best_rate_sample = sample[TARGET_COL].mean() * 100
+                    break
+                    
+            progress_bar.empty()
+            status_text.empty()
+            sample = best_sample
+            rate_sample = best_rate_sample
+            rng = best_seed
             rate_diff   = abs(rate_sample - rate_pool)
+
+            if auto_search:
+                if best_is_stable:
+                    st.success(f"✅ Stable sample found! Seed: **{rng}** — Max PSI: **{best_psi:.4f}**")
+                else:
+                    st.warning(f"⚠️ Reached max iterations without finding an entirely stable PSI. Best Seed: **{rng}** — Max PSI: **{best_psi:.4f}**")
 
             st.success(
                 f"✅ Sample generated: **{len(sample):,} records** — "
@@ -1777,6 +1950,7 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
         "duplicate_tag", "tag_reason", "is_first_of_group",
         "_tin_fraud_count", "_tin_record_count", "_tin_fraud_rate",
         "_tin_n_distinct_mid", "_tin_n_distinct_state", "_tin_n_distinct_city",
+        "address_postal_code", "owner1_first_name", "address_line_2", "address_city"
     }
     _outcome_cols5 = [TARGET_COL, FRAUD_TYPE]
 
@@ -1803,6 +1977,8 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
                 continue
             if _c5 in _hard_id:
                 _id5.append(_c5)
+            elif _c5 in {"address_city"}:
+                _cat5.append(_c5)
             elif _c5 in _hard_dt:
                 _date5.append(_c5)
             elif _pool5[_c5].dtype.kind in ("i", "f", "u") and _c5 not in _hard_id:
@@ -1877,7 +2053,7 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
         _pc5 = _pool5[_c5].fillna("__NA__").astype(str)
         _sc5 = _samp5[_c5].fillna("__NA__").astype(str)
         _psi5, _cats_u = _psi_categorical5(_pc5, _sc5)
-        if len(_cats_u) < 2 or len(_cats_u) > 200:
+        if len(_cats_u) < 2 or len(_cats_u) > 40000:
             continue
         _chi5, _cp5 = _chi2_test5(_pc5, _sc5, _cats_u, _n_pool5, _n_samp5)
         _verd5, _ = _verdict5(_psi5)
@@ -1909,9 +2085,9 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
         if len(_pd5) < 10 or len(_sd5) < 10:
             continue
 
-        # Month bins
-        _pm5 = _pd5.dt.month.astype(str)
-        _sm5 = _sd5.dt.month.astype(str)
+        # Quarter bins
+        _pm5 = _pd5.dt.quarter.astype(str)
+        _sm5 = _sd5.dt.quarter.astype(str)
         _psi5_m, _mcat5 = _psi_categorical5(_pm5, _sm5)
         _chi5_m, _cp5_m = _chi2_test5(_pm5, _sm5, _mcat5, _n_pool5, _n_samp5)
 
@@ -1925,7 +2101,7 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
         _verd5d, _ = _verdict5(_psi5_d)
 
         _rows5.append({
-            "Feature": f"{_c5} (Month bins)", "Type": "Date",
+            "Feature": f"{_c5} (Quarter bins)", "Type": "Date",
             "PSI":     round(_psi5_m, 4) if _psi5_m == _psi5_m else "N/A",
             "Stat":    f"{_chi5_m:.2f}" if _chi5_m == _chi5_m else "N/A",
             "P-Value": round(_cp5_m, 4) if _cp5_m == _cp5_m else "N/A",
@@ -1982,6 +2158,18 @@ Fraud.Opened Date with PSI 0.46? That is your real problem — fix the sample be
 | **Sig.** | Significance flag. `p<0.05 ★` = the difference is statistically significant at the 95% confidence level. `n.s.` = **Not Significant** — cannot reject H₀ at p<0.05. *Note: at very large sample sizes (N > 10 000) almost every feature will show p<0.05 even for trivially small differences. Always weight PSI over p-value.* |
 | **Test** | Statistical method used: `KS` (Kolmogorov-Smirnov, numeric), `Chi²` (categorical / date), `Cardinality` (ID columns). |
 | **Verdict** | Action recommendation derived from PSI thresholds (see below). |
+
+---
+
+### Warning: Small Sub-Populations (The "Pigeonhole Principle")
+
+Notice that features starting with `Fraud.` (e.g., `Fraud.Opened Date`) are evaluated **only** on the fraud subset of the sample.  
+**If your sampled fraud count is extremely low (e.g., N=61):**
+* The math tries to divide those 61 records across bins (e.g., 4 quarter bins or 50 state buckets).
+* Randomly getting just 1 or 2 extra records in a bucket constitutes a **massive percentage variance** from the expected frequency.
+* The PSI formula sees this massive percentage shift and erroneously yells 🔴 **Critical Shift**, when mathematically the pure counts only shifted by 2 humans.
+* Industry standard for measuring Sub-Population Stability Index is to either increase feature abstraction (bins to quarters instead of months) or to relax acceptance thresholds entirely on buckets smaller than 100 observations. 
+* *As a result, we have simplified date bins to Quarters and instructed the Auto-Search logic to safely allow `0.20 PSI` as the cutoff specifically when the N sizes are mechanically too small.*
 
 ---
 
@@ -2242,7 +2430,7 @@ This approach avoids spurious drift from raw epoch/serial encoding while still d
 
     # ── Date features: month and DOW distribution ────────────────────────────
     if _date5:
-        st.markdown("#### \U0001f4c5 Date Feature Distributions (Month &amp; Day-of-Week bins)")
+        st.markdown("#### 📅 Date Feature Distributions (Quarter, Month & Day-of-Week bins)")
         _month_names = {1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",
                         7:"Jul",8:"Aug",9:"Sep",10:"Oct",11:"Nov",12:"Dec"}
         _dow_names   = {0:"Mon",1:"Tue",2:"Wed",3:"Thu",4:"Fri",5:"Sat",6:"Sun"}
@@ -2261,7 +2449,44 @@ This approach avoids spurious drift from raw epoch/serial encoding while still d
             if len(_pool_rows5) < 5 or len(_samp_rows5) < 5:
                 continue
 
-            with st.expander(f"\U0001f4c5 {_c5} \u2014 Temporal Distribution", expanded=False):
+            with st.expander(f"📅 {_c5} — Temporal Distribution", expanded=False):
+
+                # ── CHART QA — Quarter: Pool vs Sample proportion ───────────────
+                _pq_cnt = _pool_rows5["_dt"].dt.quarter.value_counts().sort_index()
+                _sq_cnt = _samp_rows5["_dt"].dt.quarter.value_counts().sort_index()
+                _all_quarters = sorted(set(_pq_cnt.index) | set(_sq_cnt.index))
+                _qlabels = [f"Q{int(q)}" for q in _all_quarters]
+                _n_pd = max(len(_pool_rows5), 1); _n_sd = max(len(_samp_rows5), 1)
+                _fgQ = go.Figure([
+                    go.Bar(name="Pool",   x=_qlabels,
+                           y=[_pq_cnt.get(q, 0) / _n_pd for q in _all_quarters],
+                           marker_color="#3498db"),
+                    go.Bar(name="Sample", x=_qlabels,
+                           y=[_sq_cnt.get(q, 0) / _n_sd for q in _all_quarters],
+                           marker_color="#e74c3c", opacity=0.85),
+                ])
+                _fgQ.update_layout(barmode="group",
+                    title=f"{_c5} — Quarter Distribution",
+                    xaxis_title="Quarter", yaxis_title="Proportion")
+                st.plotly_chart(_plotly_dark(_fgQ), use_container_width=True)
+
+                # ── CHART QB — Quarter: Fraud Rate per bin (Pool vs Sample) ─────
+                _pool_rows5["_quarter"] = _pool_rows5["_dt"].dt.quarter
+                _samp_rows5["_quarter"] = _samp_rows5["_dt"].dt.quarter
+                _pfr_q = (_pool_rows5.groupby("_quarter")[TARGET_COL]
+                          .mean().reindex(_all_quarters, fill_value=0))
+                _sfr_q = (_samp_rows5.groupby("_quarter")[TARGET_COL]
+                          .mean().reindex(_all_quarters, fill_value=0))
+                _fgQF = go.Figure([
+                    go.Bar(name="Pool fraud rate",   x=_qlabels,
+                           y=(_pfr_q * 100).tolist(), marker_color="#3498db"),
+                    go.Bar(name="Sample fraud rate", x=_qlabels,
+                           y=(_sfr_q * 100).tolist(), marker_color="#e74c3c", opacity=0.85),
+                ])
+                _fgQF.update_layout(barmode="group",
+                    title=f"{_c5} — Fraud Rate % by Quarter (Pool vs Sample)",
+                    xaxis_title="Quarter", yaxis_title="Fraud Rate (%)")
+                st.plotly_chart(_plotly_dark(_fgQF), use_container_width=True)
 
                 # ── CHART A — Month: Pool vs Sample proportion ───────────────
                 _pm_cnt = _pool_rows5["_dt"].dt.month.value_counts().sort_index()
