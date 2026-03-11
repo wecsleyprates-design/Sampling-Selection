@@ -798,14 +798,18 @@ if 'df_clean' in st.session_state:
                 if str(c).lower() == 'uid':
                     export_df[new_col] = df_raw[c].astype(str).apply(lambda x: hashlib.sha256(x.encode()).hexdigest() if x != 'nan' and x != 'None' else '')
                 else:
-                    export_df[new_col] = df_clean.get(c, df_raw[c])
+                    if new_col in df_clean.columns:
+                        export_df[new_col] = df_clean[new_col]
+                    else:
+                        export_df[new_col] = df_clean.get(c, df_raw[c])
                 
                 # Add TIN no format
                 sem_name = "general"
                 for k, v in st.session_state.get('cfg', {}).items():
                     if v == c: sem_name = k.split('_')[0]; break
                 if sem_name == 'tin':
-                    export_df[f"{c}_worth_no_format"] = export_df[new_col].astype(str).str.replace('-', '')
+                    cleaned_tin = export_df[new_col].astype(str).str.replace('-', '')
+                    export_df[f"{c}_worth_no_format"] = cleaned_tin.apply(lambda x: '="' + x + '"' if x and x.lower() not in ['nan', 'none', ''] else '')
                 
         # 3. Add generated _worth address columns specifically parsed from business_address
         worth_cols = [c for c in df_clean.columns if c.endswith('_worth')]
