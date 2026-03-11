@@ -203,8 +203,18 @@ def parse_piped_address(row, addr_col, lgl_col, dba_col):
     
     is_match = False
     if len(c_first) > 3:
-        if (c_lgl and (c_first in c_lgl or c_lgl in c_first)) or (c_dba and (c_first in c_dba or c_dba in c_first)):
+        import difflib
+        r_lgl = difflib.SequenceMatcher(None, c_first, c_lgl).ratio() if c_lgl else 0
+        r_dba = difflib.SequenceMatcher(None, c_first, c_dba).ratio() if c_dba else 0
+        
+        # Exact match or very high similarity means it's the company name
+        if c_first == c_lgl or c_first == c_dba or r_lgl > 0.85 or r_dba > 0.85:
             is_match = True
+        # Or if the company name perfectly encapsulates the first token without address digits
+        elif not __import__('re').match(r'^\d+', first_part.strip()):
+            if (c_lgl and c_lgl in c_first and len(c_lgl) > 5) or (c_dba and c_dba in c_first and len(c_dba) > 5):
+                if max(r_lgl, r_dba) > 0.65:
+                    is_match = True
     
     if is_match:
         prefix_parts = prefix_parts[1:]
