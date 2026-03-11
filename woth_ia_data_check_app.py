@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 
 from woth_data_engine import run_data_check_and_cleaning, DQ_TAG_COLORS, DQ_TAG_ICONS, DQ_TAG_DESC
+from html_report_template import generate_html_report, extract_plotly_html, dict_to_metric_html
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONFIG
@@ -68,7 +69,7 @@ def _plotly_dark(fig):
 # ─────────────────────────────────────────────────────────────────────────────
 # APP LAYOUT
 # ─────────────────────────────────────────────────────────────────────────────
-st.title("🧹 Woth IA Data Check App")
+st.title("🧹 Worth IA Data Check App")
 st.markdown("<div class='info-box'>Upload a dataset to run data quality checks, identify format issues/errors, missing values, whitespaces, and standardise records.</div>", unsafe_allow_html=True)
 
 with st.sidebar:
@@ -93,18 +94,17 @@ if df_raw is not None and 'df_clean' not in st.session_state:
         cfg = {}
         for col in df_raw.columns:
             cl = str(col).lower()
-            if 'phone' in cl and 'phone' not in cfg: cfg['phone'] = col
-            elif 'tin' in cl and 'tin' not in cfg: cfg['tin'] = col
-            elif 'address' in cl and 'address' not in cfg: cfg['address'] = col
-            elif 'city' in cl and 'city' not in cfg: cfg['city'] = col
-            elif 'state' in cl and 'state' not in cfg: cfg['state'] = col
-            elif ('zip' in cl or 'postal' in cl) and 'zip' not in cfg: cfg['zip'] = col
-            elif ('company' in cl or 'business' in cl) and 'company_name' not in cfg: cfg['company_name'] = col
-            elif 'dba' in cl and 'dba' not in cfg: cfg['dba'] = col
-            elif 'first' in cl and 'first_name' not in cfg: cfg['first_name'] = col
-            elif 'last' in cl and 'last_name' not in cfg: cfg['last_name'] = col
-            elif df_raw[col].dtype in ['datetime64[ns]'] and 'datetime' not in cfg: 
-                cfg['datetime'] = [col]
+            if ('phone' in cl or 'mobile' in cl): cfg[f'phone_{col}'] = col
+            elif 'tin' in cl: cfg[f'tin_{col}'] = col
+            elif 'address' in cl: cfg[f'address_{col}'] = col
+            elif 'city' in cl: cfg[f'city_{col}'] = col
+            elif 'state' in cl: cfg[f'state_{col}'] = col
+            elif ('zip' in cl or 'postal' in cl): cfg[f'zip_{col}'] = col
+            elif ('company' in cl or 'business' in cl): cfg[f'company_name_{col}'] = col
+            elif 'dba' in cl: cfg[f'dba_{col}'] = col
+            elif 'first' in cl: cfg[f'first_name_{col}'] = col
+            elif 'last' in cl: cfg[f'last_name_{col}'] = col
+            elif df_raw[col].dtype in ['datetime64[ns]']: cfg[f'datetime_{col}'] = col
         
         st.session_state['cfg'] = cfg
         df_clean, df_issues, stats_summary = run_data_check_and_cleaning(df_raw, cfg)
@@ -124,6 +124,94 @@ if 'df_clean' in st.session_state:
     stats = stats_dict['global']
     feat_qual_orig = stats_dict.get('feature_quality_orig', {})
     feat_qual_clean = stats_dict.get('feature_quality_clean', {})
+    
+    # ─── AUTO-GENERATE INSIGHTS ───────────────────────────────────────────────
+    if 'auto_insights_generated' not in st.session_state:
+        # 1. Global Notes
+        total = stats.get('total_rows', 0)
+        issues = stats.get('rows_with_issues', 0)
+        miss = stats.get('missing_values_count', 0)
+        pct_issue = round((issues / total) * 100, 1) if total else 0
+        g_note = f"The engine successfully ingested {total:,} records. It identified {issues:,} records ({pct_issue}%) containing structure or format failures and detected {miss:,} absolute missing data points across the initial schema. Overall dataset resilience is {'Strong' if pct_issue < 20 else ('Moderate' if pct_issue < 50 else 'Weak')}."
+        
+        # 2. Feature Notes
+        f_note = "Evaluation of parsed columns:\n"
+        if feat_qual_orig:
+            sorted_feats = sorted(feat_qual_orig.values(), key=lambda x: x['score'])
+            worst = sorted_feats[0]
+            best = sorted_feats[-1]
+            f_note += f"- Highest Risk Feature: {worst['col_name']} (Score: {worst['score']}%) suffered {worst['missing']} missing values and {worst['invalid']} structural format errors.\n"
+            f_note += f"- Safest Feature: {best['col_name']} (Score: {best['score']}%) remained highly structured with {best['missing']} missing values.\n"
+        
+        # 3. Duplicate Notes
+        d_note = "Entity Resolution Profiling:\n"
+        if '_duplicate_tag' in df_issues.columns:
+            vc = df_issues['_duplicate_tag'].value_counts()
+            if not vc.empty:
+                d_note += f"The system isolated {vc.sum():,} structurally complex records. The dominant issue was {vc.index[0]} ({vc.iloc[0]:,} instances)."
+            else:
+                d_note += "No structural identity duplicates or historical resubmissions were identified. All rows represent distinct entities."
+        else:
+            d_note += "Duplicate checking matrix was not invoked for this dataset."
+
+        st.session_state['note_global'] = g_note
+        st.session_state['note_details'] = f_note
+        st.session_state['note_unres'] = d_note
+        st.session_state['auto_insights_generated'] = True
+    # ─── AUTO-GENERATE INSIGHTS ───────────────────────────────────────────────
+    if 'auto_insights_generated' not in st.session_state:
+        total = stats.get('total_rows', 0)
+        issues = stats.get('rows_with_issues', 0)
+        miss = stats.get('missing_values_count', 0)
+        pct_issue = round((issues / total) * 100, 1) if total else 0
+        
+        # 1. Tab 1 Note (Raw Data & Identity)
+        g_note = f"The engine successfully ingested {total:,} records. It identified {issues:,} records ({pct_issue}%) containing structure or format failures and detected {miss:,} absolute missing data points across the initial schema. Overall dataset resilience is {'Strong' if pct_issue < 20 else ('Moderate' if pct_issue < 50 else 'Weak')}."
+        
+        # 2. Tab 2 Note (Anomalies)
+        f_note = "Evaluation of parsed columns:\n"
+        if feat_qual_orig:
+            sorted_feats = sorted(feat_qual_orig.values(), key=lambda x: x['score'])
+            worst = sorted_feats[0]
+            best = sorted_feats[-1]
+            f_note += f"- Highest Risk Feature: {worst['col_name']} (Score: {worst['score']}%) suffered {worst['missing']} missing values and {worst['invalid']} structural format errors.\n"
+            f_note += f"- Safest Feature: {best['col_name']} (Score: {best['score']}%) remained highly structured with {best['missing']} missing values.\n"
+            
+        # 3. Tab 3 Note (Clean vs Original)
+        c_note = "Algorithmic transformation summary: "
+        if feat_qual_clean:
+            sorted_clean = sorted(feat_qual_clean.values(), key=lambda x: x['score'])
+            c_note += f"Post-cleaning, the lowest scoring feature shifted to {sorted_clean[0]['col_name']} at {sorted_clean[0]['score']}%. Detailed row-level comparisons below isolate unmodified original records."
+        else:
+            c_note += "No clean modifications applied."
+            
+        # 4. Tab 4 Note (Rules)
+        r_note = "Applied strict standardization matrices against string values, telephony, TIN formats, and piped business addresses to conform syntax prior to entity resolution."
+        
+        # 5. Tab 5 Note (Export Schema)
+        d_note = "Entity Resolution Profiling:\n"
+        if '_duplicate_tag' in df_issues.columns:
+            vc = df_issues['_duplicate_tag'].value_counts()
+            if not vc.empty:
+                d_note += f"The system isolated {vc.sum():,} structurally complex records via identical metadata. Dominant issue: {vc.index[0]} ({vc.iloc[0]:,} instances)."
+            else:
+                d_note += "No structural identity duplicates were identified."
+        else:
+            d_note += "Duplicate checking matrix was not invoked."
+
+        st.session_state['note_tab1'] = g_note
+        st.session_state['note_tab2'] = f_note
+        st.session_state['note_tab3'] = c_note
+        st.session_state['note_tab4'] = r_note
+        st.session_state['note_tab5'] = d_note
+        st.session_state['auto_insights_generated'] = True
+    # ─────────────────────────────────────────────────────────────────────────
+
+    st.markdown("---")
+    # Create an empty container that we will fill with the download button at the END of the script
+    export_placeholder = st.empty()
+
+    st.markdown("<br>", unsafe_allow_html=True)
     
     TAB1, TAB2, TAB3, TAB4, TAB5 = st.tabs([
         "📉 Original Dataset Features (Raw)",
@@ -156,6 +244,10 @@ if 'df_clean' in st.session_state:
             fig_fq.update_layout(showlegend=False, xaxis_range=[0,105])
             fig_fq.update_coloraxes(showscale=False)
             st.plotly_chart(_plotly_dark(fig_fq), use_container_width=True, key=f"fq_bar_{is_clean}")
+            if not is_clean: 
+                st.session_state['fig_fq'] = fig_fq
+            else:
+                st.session_state['fig_fq_clean'] = fig_fq
             
         with col_score:
             html_content = f"""
@@ -188,17 +280,23 @@ if 'df_clean' in st.session_state:
                         
                         if is_clean:
                             # CLEAN DATASET SAMPLES
-                            if "tin" in st.session_state.get('cfg', {}) and c == st.session_state['cfg']["tin"]:
+                            semantic_name = "general"
+                            for k, v in st.session_state.get('cfg', {}).items():
+                                if v == c:
+                                    semantic_name = k.split('_')[0]
+                                    break
+                                    
+                            if semantic_name == "tin":
                                 t_mask = df_clean[c].dropna().astype(str).str.match(r"^\d{2}-\d{7}$").eq(False)
                                 if t_mask.any():
                                     unres_idx = df_raw.loc[t_mask.index[t_mask]].head(10).index
                                     sample_local = [{"Original Value": str(df_raw.at[i, c]), "Clean Attempt": str(df_clean.at[i, c]), "Failure Reason": "TIN structure incorrect (Length or Delimiter)"} for i in unres_idx]
-                            elif "phone" in st.session_state.get('cfg', {}) and c == st.session_state['cfg']["phone"]:
+                            elif semantic_name == "phone":
                                 p_mask = df_clean[c].dropna().astype(str).str.match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$").eq(False)
                                 if p_mask.any():
                                     unres_idx = df_raw.loc[p_mask.index[p_mask]].head(10).index
                                     sample_local = [{"Original Value": str(df_raw.at[i, c]), "Clean Attempt": str(df_clean.at[i, c]), "Failure Reason": "Phone length incorrect"} for i in unres_idx]
-                            elif "zip" in st.session_state.get('cfg', {}) and c == st.session_state['cfg']["zip"]:
+                            elif semantic_name == "zip":
                                 z_mask = df_clean[c].dropna().astype(str).str.match(r"^\d{5}$").eq(False)
                                 if z_mask.any():
                                     unres_idx = df_raw.loc[z_mask.index[z_mask]].head(10).index
@@ -281,6 +379,7 @@ if 'df_clean' in st.session_state:
                 fig_pie.update_traces(textposition='outside', textinfo='percent+label')
                 fig_pie.update_layout(showlegend=False)
                 st.plotly_chart(_plotly_dark(fig_pie), use_container_width=True)
+                st.session_state['fig_pie'] = fig_pie
         with col2:
             if not tag_counts.empty:
                 tag_counts_sorted = tag_counts.sort_values(by='Count', ascending=True)
@@ -289,6 +388,7 @@ if 'df_clean' in st.session_state:
                                  title="Record Count by Duplicate Tag", text='Count')
                 fig_bar.update_layout(showlegend=False)
                 st.plotly_chart(_plotly_dark(fig_bar), use_container_width=True)
+                st.session_state['fig_bar'] = fig_bar
                 
         st.markdown("---")
         st.subheader("Raw Data Sample by Standardization Rules")
@@ -305,6 +405,9 @@ if 'df_clean' in st.session_state:
             st.success(f"No records failed the {rule_sel} rule!")
         else:
             st.dataframe(matched_df.head(200), use_container_width=True, hide_index=True)
+            
+        st.markdown("---")
+        st.text_area("✍️ Analyst Interpretations / Raw Dataset:", key="note_tab1", height=120, placeholder="Write your assessment of the dataset size, global scope, and raw feature metrics here to include in the HTML report.")
             
     with TAB2:
         st.subheader("Detailed Issue Report")
@@ -369,6 +472,7 @@ if 'df_clean' in st.session_state:
                                  title="Issues by Severity", text='Count')
                 fig_sev.update_layout(showlegend=False, xaxis_title="", yaxis_title="")
                 st.plotly_chart(_plotly_dark(fig_sev), use_container_width=True, key="sev_bar")
+                st.session_state['fig_sev'] = fig_sev
                 
             with col_chart2:
                 type_counts = melt_issues['Issue Type'].value_counts().reset_index()
@@ -379,6 +483,7 @@ if 'df_clean' in st.session_state:
                 fig_type.update_layout(showlegend=False)
                 fig_type.update_traces(textposition='inside', textinfo='percent+label')
                 st.plotly_chart(_plotly_dark(fig_type), use_container_width=True, key="type_pie")
+                st.session_state['fig_type'] = fig_type
                 
             st.markdown("---")
             st.markdown("##### Filter Extracted Issue Database")
@@ -398,8 +503,12 @@ if 'df_clean' in st.session_state:
                 st.info(f"No corresponding issues found.")
             else:
                 st.dataframe(filtered_issues[display_cols], use_container_width=True, hide_index=True)
+                st.session_state['df_filtered_issues'] = filtered_issues[display_cols].head(100)
         else:
             st.info("No detailed column-level issues detected.")
+            
+        st.markdown("---")
+        st.text_area("✍️ Analyst Interpretations / Error Strategy Details:", key="note_tab2", height=120, placeholder="Write your assessment of the specific column issues detected and mapping resolutions here to include in the HTML report.")
             
     with TAB3:
         st.subheader("Cleaned Dataset Feature Score Quality")
@@ -421,35 +530,34 @@ if 'df_clean' in st.session_state:
         unfixable_records = pd.DataFrame()
         
         cfg = st.session_state.get("cfg", {})
-        if "tin" in cfg and cfg["tin"] in df_clean.columns:
-            t_col = cfg["tin"]
-            t_mask = df_clean[t_col].dropna().astype(str).str.match(r"^\d{2}-\d{7}$").eq(False)
-            if t_mask.any():
-                unfixable += t_mask.sum()
-                bad_tins = df_raw.loc[t_mask.index[t_mask]].copy()
-                bad_tins['Unfixable Feature'] = 'TIN'
-                bad_tins['Failure Reason'] = 'Does not match exactly 9 digits after stripping'
-                unfixable_records = pd.concat([unfixable_records, bad_tins])
-                
-        if "phone" in cfg and cfg["phone"] in df_clean.columns:
-            p_col = cfg["phone"]
-            p_mask = df_clean[p_col].dropna().astype(str).str.match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$").eq(False)
-            if p_mask.any():
-                unfixable += p_mask.sum()
-                bad_phones = df_raw.loc[p_mask.index[p_mask]].copy()
-                bad_phones['Unfixable Feature'] = 'Phone'
-                bad_phones['Failure Reason'] = 'Length not exactly 10 or 11 integers'
-                unfixable_records = pd.concat([unfixable_records, bad_phones])
-        
-        if "zip" in cfg and cfg["zip"] in df_clean.columns:
-            z_col = cfg["zip"]
-            z_mask = df_clean[z_col].dropna().astype(str).str.match(r"^\d{5}$").eq(False)
-            if z_mask.any():
-                unfixable += z_mask.sum()
-                bad_zips = df_raw.loc[z_mask.index[z_mask]].copy()
-                bad_zips['Unfixable Feature'] = 'Zip'
-                bad_zips['Failure Reason'] = 'Invalid Postal Code format'
-                unfixable_records = pd.concat([unfixable_records, bad_zips])
+        for sem_col, c_name in cfg.items():
+            if c_name not in df_clean.columns: continue
+            
+            semantic = sem_col.split('_')[0]
+            if semantic == "tin":
+                t_mask = df_clean[c_name].dropna().astype(str).str.match(r"^\d{2}-\d{7}$").eq(False)
+                if t_mask.any():
+                    unfixable += t_mask.sum()
+                    bad_tins = df_raw.loc[t_mask.index[t_mask]].copy()
+                    bad_tins['Unfixable Feature'] = 'TIN'
+                    bad_tins['Failure Reason'] = 'Does not match exactly 9 digits after stripping'
+                    unfixable_records = pd.concat([unfixable_records, bad_tins])
+            elif semantic == "phone":
+                p_mask = df_clean[c_name].dropna().astype(str).str.match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$").eq(False)
+                if p_mask.any():
+                    unfixable += p_mask.sum()
+                    bad_phones = df_raw.loc[p_mask.index[p_mask]].copy()
+                    bad_phones['Unfixable Feature'] = 'Phone'
+                    bad_phones['Failure Reason'] = 'Length not exactly 10 or 11 integers'
+                    unfixable_records = pd.concat([unfixable_records, bad_phones])
+            elif semantic == "zip":
+                z_mask = df_clean[c_name].dropna().astype(str).str.match(r"^\d{5}$").eq(False)
+                if z_mask.any():
+                    unfixable += z_mask.sum()
+                    bad_zips = df_raw.loc[z_mask.index[z_mask]].copy()
+                    bad_zips['Unfixable Feature'] = 'Zip'
+                    bad_zips['Failure Reason'] = 'Invalid Postal Code format'
+                    unfixable_records = pd.concat([unfixable_records, bad_zips])
         
         m_col1, m_col2, m_col3, m_col4 = st.columns(4)
         m_col1.markdown(_metric_card("Total Rows", f"{len(df_raw):,}", "#3498db"), unsafe_allow_html=True)
@@ -500,15 +608,21 @@ if 'df_clean' in st.session_state:
                         
                         is_unfixable = False
                         if "FORMAT_ISSUE" in f_tags:
-                            if "tin" in cfg and col == cfg["tin"]:
+                            semantic_name = "general"
+                            for k, v in st.session_state.get('cfg', {}).items():
+                                if v == col:
+                                    semantic_name = k.split('_')[0]
+                                    break
+                                    
+                            if semantic_name == "tin":
                                 if not pd.isna(changed_clean.at[i, col]) and not str(changed_clean.at[i, col]).startswith("nan") and not __import__('re').match(r"^\d{2}-\d{7}$", clean_v):
                                     is_unfixable = True
                                     failure_reason = "TIN Length Error (Not 9 digits)"
-                            elif "phone" in cfg and col == cfg["phone"]:
+                            elif semantic_name == "phone":
                                 if not pd.isna(changed_clean.at[i, col]) and not str(changed_clean.at[i, col]).startswith("nan") and not __import__('re').match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$", clean_v):
                                     is_unfixable = True
                                     failure_reason = "Phone Length Error (Not 10/11 digits)"
-                            elif "zip" in cfg and col == cfg["zip"]:
+                            elif semantic_name == "zip":
                                 if not pd.isna(changed_clean.at[i, col]) and not str(changed_clean.at[i, col]).startswith("nan") and not __import__('re').match(r"^\d{5}$", clean_v):
                                     is_unfixable = True
                                     failure_reason = "Invalid Postal Code format"
@@ -544,6 +658,7 @@ if 'df_clean' in st.session_state:
                                        title="Distribution of Unfixable Records by Feature & Reason", text='Count',
                                        color_discrete_sequence=px.colors.qualitative.Pastel)
                     st.plotly_chart(_plotly_dark(fig_unres), use_container_width=True)
+                    st.session_state['fig_unres'] = fig_unres
                     st.markdown("---")
                 
                 # Interactive Display Setup
@@ -573,6 +688,7 @@ if 'df_clean' in st.session_state:
                 if search_str:
                     filtered_comp = filtered_comp[filtered_comp.astype(str).apply(lambda x: x.str.contains(search_str, case=False)).any(axis=1)]
                 
+                st.session_state['df_comp_table'] = filtered_comp
                 st.markdown(f"**Found {len(filtered_comp)} modified records matching criteria:**")
                 st.dataframe(
                     filtered_comp,
@@ -587,7 +703,8 @@ if 'df_clean' in st.session_state:
                     }
                 )
             
-
+        st.markdown("---")
+        st.text_area("✍️ Analyst Interpretations / Output Comparison:", key="note_tab3", height=120, placeholder="Write your assessment analyzing why certain records failed standardization or comparing the clean vs raw changes here to include in the HTML report.")
             
     with TAB4:
         st.markdown("<h3 style='margin-bottom:2px;'>📖 Standardization Rules & Data Checks Definition</h3>", unsafe_allow_html=True)
@@ -619,14 +736,14 @@ if 'df_clean' in st.session_state:
                     <td>All special characters are deleted. Consecutive spaces are shrunk to a single space. Name is forced into <code>UPPERCASE</code> to ensure exact matching across variants.</td>
                 </tr>
                 <tr>
-                    <td class='t-tag'>Business Address</td>
+                    <td class='t-tag'>Business Address (Piped)</td>
                     <td><span class='err-tag'>MISSING</span> Flagged if address is completely blank.<br><span class='warn-tag'>FORMAT</span> Flagged if formatting violates standard US postal structure.</td>
-                    <td>Determines Type <b>Commercial</b> vs <b>Residential</b> by searching for keywords (<i>suite, bldg, floor, plaza, center</i>). Then strips irregular characters and spaces.</td>
+                    <td>Splits incoming strings via <code>|</code> delimiter into distinct <code>_worth</code> columns. Cross-references the first segment against <code>lgl_nm</code> and <code>dba_nm</code> and excludes it if it's a redundant company name. Joins isolated components into a pristine <code>full_address_worth</code> string. Remaining original <code>business_address</code> is preserved.</td>
                 </tr>
                 <tr>
                     <td class='t-tag'>TIN (Tax ID)</td>
                     <td><span class='err-tag'>MISSING</span> Missing TIN invalidates KYC processes.<br><span class='warn-tag'>FORMAT ISSUE</span> Flagged if the count of numbers inside the string is not exactly 9 digits.</td>
-                    <td>Safely trims floating decimals (e.g. <code>.0</code>). Strips alphabetical characters and hyphens. Only if it yields exactly 9 digits is it formatted natively as <code>XX-XXXXXXX</code>.</td>
+                    <td>Safely trims floating decimals (e.g. <code>.0</code>). Strips alphabetical characters and hyphens. Detects exactly 8-digit TIN anomalies and automatically prefixes them with a <code>0</code>. Outputs standard native <code>XX-XXXXXXX</code> or falls back to SSN structure <code>XXX-XX-XXXX</code>.</td>
                 </tr>
                 <tr>
                     <td class='t-tag'>Telephone Numbers</td>
@@ -656,44 +773,103 @@ if 'df_clean' in st.session_state:
             </table>
             """
         , unsafe_allow_html=True)
+        st.markdown("---")
+        st.text_area("✍️ Analyst Interpretations / Applied Normalization Rules:", key="note_tab4", height=120, placeholder="Write your assessment of the applied algorithms here.")
 
     with TAB5:
         st.subheader("✅ Final Cleaned Model Dataset")
-        st.markdown("<div class='info-box'>This dataset represents the final pristine records with all engine standardizations applied. Any columns with unresolvable anomalies or missing values should be handled upstream or via imputation.</div>", unsafe_allow_html=True)
+        st.markdown("<div class='info-box'>This dataset represents the final pristine records with original features suffixed with _received and standardizations applied to features suffixed with _worth.</div>", unsafe_allow_html=True)
         
+        # Build Export Schema dynamically here
+        import hashlib
+        export_df = pd.DataFrame(index=df_raw.index)
+        bus_addr_col = next((c for c in df_raw.columns if 'business_address' in str(c).lower()), None)
+        
+        # 1. ADD RECEIVED COLUMNS FIRST
+        for c in df_raw.columns:
+            export_df[f"{c}_received"] = df_raw[c]
+            
+        # 2. ADD WORTH COLUMNS
+        for c in df_raw.columns:
+            if c != bus_addr_col:
+                new_col = f"{c}_worth"
+                
+                # Check UID logic: if original column name 'uid', generate sha256
+                if str(c).lower() == 'uid':
+                    export_df[new_col] = df_raw[c].astype(str).apply(lambda x: hashlib.sha256(x.encode()).hexdigest() if x != 'nan' and x != 'None' else '')
+                else:
+                    export_df[new_col] = df_clean.get(c, df_raw[c])
+                
+                # Add TIN no format
+                sem_name = "general"
+                for k, v in st.session_state.get('cfg', {}).items():
+                    if v == c: sem_name = k.split('_')[0]; break
+                if sem_name == 'tin':
+                    export_df[f"{c}_worth_no_format"] = export_df[new_col].astype(str).str.replace('-', '')
+                
+        # 3. Add generated _worth address columns specifically parsed from business_address
+        worth_cols = [c for c in df_clean.columns if c.endswith('_worth')]
+        for c in worth_cols:
+            if c not in export_df.columns:
+                export_df[c] = df_clean[c]
+        
+        # 4. Additional normalized fields generated by the engine
+        norm_cols = [c for c in df_clean.columns if c.endswith('_normalized') or c.endswith('_type')]
+        for c in norm_cols:
+            if c not in export_df.columns:
+                export_df[c] = df_clean[c]
+                
+        # 5. Append Duplicate Tag_worth and Description_worth matching the UI Rules
+        if '_duplicate_tag' in df_issues.columns:
+            export_df['Tag_worth'] = df_issues['_duplicate_tag'].fillna('NO_DUPLICATE_ISSUE')
+            export_df['Description_worth'] = export_df['Tag_worth'].apply(lambda x: DQ_TAG_DESC.get(x, 'Record is clean and passed structural uniqueness tests.'))
+                
         # Export logic
         col1, col2 = st.columns([1, 4])
         with col1:
             @st.cache_data
             def convert_csv_final(df):
                 return df.to_csv(index=False).encode('utf-8')
-            csv_final = convert_csv_final(df_clean)
+            csv_final = convert_csv_final(export_df)
             st.download_button("⬇️ Download Final CSV", csv_final, "woth_final_cleaned_data.csv", "text/csv", use_container_width=True)
             
         st.markdown("---")
+        st.markdown(f"**Showing the first 100 rows with original `_received` and cleaned `_worth` features:**")
+        st.dataframe(export_df.head(100), use_container_width=True)
         
-        # Visual representation:
-        # Instead of just showing df_clean normally, we want to highlight changes.
-        # But for 25k records, styling row by row is slow. We can style a paginated slice.
+        st.markdown("---")
+        st.text_area("✍️ Analyst Interpretations / Final Delivered Schema:", key="note_tab5", height=120, placeholder="Write your concluding assessment of the final modeling dataset here.")
+
+        # --- BUILD AND INJECT HTML REPORT ---
+        m_html = {
+            'tab1_metrics': dict_to_metric_html("Total Rows", f"{stats['total_rows']:,}") +
+                            dict_to_metric_html("Good Rows", f"{stats['good_rows']:,}", "#27ae60") +
+                            dict_to_metric_html("Rows w/ Issues", f"{stats['rows_with_issues']:,}", "#e74c3c"),
+            'tab3_metrics': dict_to_metric_html("Original Missing", f"{df_raw.isna().sum().sum():,}", "#e74c3c")
+        }
         
-        def styling_logic(val, row_idx, col_name):
-            if col_name not in df_raw.columns: return ''
-            orig = str(df_raw.at[row_idx, col_name])
-            clean = str(val)
-            if orig != clean and orig != 'nan' and clean != 'nan':
-                return 'background-color: #1a4f2c; color: #a8e6cf' # Green for fixed
-            return ''
-            
-        # Select features to show
-        cfg = st.session_state.get('cfg', {})
-        mapping_cols = list(cfg.values())
-        if not mapping_cols:
-            mapping_cols = df_clean.columns.tolist()
-            
-        display_df = df_clean.copy()
+        c_html = {
+            'tag_pie': extract_plotly_html(st.session_state.get('fig_pie')),
+            'tag_bar': extract_plotly_html(st.session_state.get('fig_bar')),
+            'sev_bar': extract_plotly_html(st.session_state.get('fig_sev')),
+            'type_pie': extract_plotly_html(st.session_state.get('fig_type')),
+            'fq_bar_clean': extract_plotly_html(st.session_state.get('fig_fq_clean')),
+            'unres_bar': extract_plotly_html(st.session_state.get('fig_unres'))
+        }
         
-        # We'll just show the first 100 rows styled to avoid memory limits in Streamlit web browser rendering
-        st.markdown(f"**Showing the first 100 rows with green highlights indicating engine corrections:**")
+        t_html = {
+            'filtered_issues': st.session_state.get('df_filtered_issues', pd.DataFrame()).to_html(index=False, classes="table") if 'df_filtered_issues' in st.session_state else "",
+            'comp_table': st.session_state.get('df_comp_table', pd.DataFrame()).head(100).to_html(index=False, classes="table") if 'df_comp_table' in st.session_state else "",
+            'final_table': export_df.head(50).to_html(index=False, classes="table")
+        }
         
-        styled_slice = display_df.head(100).style.apply(lambda x: [styling_logic(v, x.name, x.index[i]) for i, v in enumerate(x)], axis=1)
-        st.dataframe(styled_slice, use_container_width=True)
+        a_notes = {
+            'note_tab1': st.session_state.get('note_tab1', ''),
+            'note_tab2': st.session_state.get('note_tab2', ''),
+            'note_tab3': st.session_state.get('note_tab3', ''),
+            'note_tab4': st.session_state.get('note_tab4', ''),
+            'note_tab5': st.session_state.get('note_tab5', '')
+        }
+        
+        html_export = generate_html_report(m_html, c_html, t_html, a_notes)
+        export_placeholder.download_button("📥 Download Comprehensive Business Report (All Tabs)", data=html_export, file_name="WOTH_Enterprise_Data_Quality_Report.html", mime="text/html", use_container_width=True)

@@ -80,7 +80,7 @@ def identify_phone_format_issues(series: pd.Series) -> pd.Series:
     """Identifies phone numbers that do not yield 10 digits or 11 (starting with 1)."""
     def is_invalid_phone(val):
         if pd.isna(val) or str(val).strip() == "": return False
-        v = str(val)
+        v = str(val).strip()
         if v.endswith(".0"): v = v[:-2]
         digits = re.sub(r"\D", "", v)
         if len(digits) == 10: return False
@@ -170,6 +170,55 @@ def check_address_type(series: pd.Series) -> pd.Series:
     """Classifies address into Commercial/Residential."""
     return series.apply(lambda x: "Commercial" if is_commercial_address(x) else ("Residential" if pd.notna(x) else "Unknown"))
 
+def parse_piped_address(row, addr_col, lgl_col, dba_col):
+    addr = str(row.get(addr_col, ''))
+    if pd.isna(row.get(addr_col)) or addr.strip() == '' or addr.lower() == 'nan':
+        return pd.Series(['', '', '', '', '', '', ''])
+    
+    parts = [p.strip() for p in addr.split('|')]
+    if len(parts) < 4:
+        # Fallback if there aren't enough pipes
+        a1 = parts[0]
+        return pd.Series([a1, '', '', '', '', '', a1])
+        
+    # The last 4 sections of the pipe structure are always City, Region, Zip, Country
+    country = parts[-1]
+    zipc = parts[-2]
+    region = parts[-3]
+    city = parts[-4]
+    
+    prefix_parts = parts[:-4]
+    if not prefix_parts:
+        return pd.Series(['', '', city, region, zipc, country, addr])
+        
+    first_part = prefix_parts[0]
+    lgl = str(row.get(lgl_col, '')).strip().upper() if lgl_col else ''
+    dba = str(row.get(dba_col, '')).strip().upper() if dba_col else ''
+    first_upper = first_part.upper()
+    
+    def clean_for_cmp(v): return __import__('re').sub(r'[^A-Z0-9]', '', v)
+    c_first = clean_for_cmp(first_upper)
+    c_lgl = clean_for_cmp(lgl)
+    c_dba = clean_for_cmp(dba)
+    
+    is_match = False
+    if len(c_first) > 3:
+        if (c_lgl and (c_first in c_lgl or c_lgl in c_first)) or (c_dba and (c_first in c_dba or c_dba in c_first)):
+            is_match = True
+    
+    if is_match:
+        prefix_parts = prefix_parts[1:]
+        
+    a1 = prefix_parts[0] if len(prefix_parts) > 0 else ''
+    a2 = prefix_parts[1] if len(prefix_parts) > 1 else ''
+    if len(prefix_parts) > 2:
+        a2 = ", ".join([p for p in prefix_parts[1:] if p])
+    
+    valid_parts = [p for p in [a1, a2, city, region, zipc, country] if p]
+    full_addr = ", ".join(valid_parts)
+    
+    return pd.Series([a1, a2, city, region, zipc, country, full_addr])
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CLEANING & STANDARDIZATION FUNCTIONS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -188,7 +237,7 @@ def clean_special_chars(val):
 
 def standardize_phone(val):
     if pd.isna(val): return val
-    val = str(val)
+    val = str(val).strip()
     if val.endswith(".0"):
         val = val[:-2]
     # Extract only digits
@@ -205,6 +254,10 @@ def standardize_tin(val):
     if val.endswith(".0"):
         val = val[:-2]
     digits = re.sub(r"\D", "", val)
+    
+    if len(digits) == 8:
+        digits = "0" + digits
+        
     if len(digits) == 9:
         # EINs typically have specific prefixes (e.g. 10-16, 20-30, etc.)
         # Often EINs are XX-XXXXXXX, SSNs are XXX-XX-XXXX
@@ -286,62 +339,62 @@ def run_data_check_and_cleaning(df: pd.DataFrame,
         df_clean[col] = df_clean[col].apply(clean_whitespace)
         
     # Process specific fields if provided in config
-    if 'phone' in columns_config and columns_config['phone'] in df.columns:
-        p_col = columns_config['phone']
-        bad_phone = identify_phone_format_issues(df[p_col])
-        df_issues[p_col + "_has_format"] = bad_phone
-        if bad_phone.any():
-            df_issues.loc[bad_phone, "_issue_tags"] += "FORMAT_ISSUE,"
-            df_issues.loc[bad_phone, "_has_issue"] = True
-        df_clean[p_col] = df_clean[p_col].apply(standardize_phone)
+    for semantic_name, col_name in columns_config.items():
+        if col_name not in df.columns: continue
         
-    if 'zip' in columns_config and columns_config['zip'] in df.columns:
-        z_col = columns_config['zip']
-        bad_zip = identify_zip_format_issues(df[z_col])
-        df_issues[z_col + "_has_format"] = bad_zip
-        if bad_zip.any():
-            df_issues.loc[bad_zip, "_issue_tags"] += "FORMAT_ISSUE,"
-            df_issues.loc[bad_zip, "_has_issue"] = True
-        df_clean[z_col] = df_clean[z_col].apply(standardize_zip)
-        
-    if 'tin' in columns_config and columns_config['tin'] in df.columns:
-        t_col = columns_config['tin']
-        bad_tin = identify_tin_format_issues(df[t_col])
-        df_issues[t_col + "_has_format"] = bad_tin
-        if bad_tin.any():
-            df_issues.loc[bad_tin, "_issue_tags"] += "FORMAT_ISSUE,"
-            df_issues.loc[bad_tin, "_has_issue"] = True
-        df_clean[t_col] = df_clean[t_col].apply(standardize_tin)
-        
-    if 'address' in columns_config and columns_config['address'] in df.columns:
-        a_col = columns_config['address']
-        df_clean[a_col + "_type"] = check_address_type(df[a_col])
-        df_clean[a_col] = df_clean[a_col].apply(standardize_name)
-        
-    if 'datetime' in columns_config:
-        for dt_col in columns_config['datetime']:
-            if dt_col in df.columns:
-                df_clean[dt_col] = standardize_datetime(df_clean[dt_col])
-
-    # Name conversions
-    name_keys = ['company_name', 'dba', 'first_name', 'last_name', 'city']
-    for nk in name_keys:
-        if nk in columns_config and columns_config[nk] in df.columns:
-            df_clean[columns_config[nk]] = df_clean[columns_config[nk]].apply(standardize_name)
+        if semantic_name.startswith('phone'):
+            bad_phone = identify_phone_format_issues(df[col_name])
+            df_issues[col_name + "_has_format"] = bad_phone
+            if bad_phone.any():
+                df_issues.loc[bad_phone, "_issue_tags"] += "FORMAT_ISSUE,"
+                df_issues.loc[bad_phone, "_has_issue"] = True
+            df_clean[col_name] = df_clean[col_name].apply(standardize_phone)
             
-    # Normalize entity names for comparison (creates a new column for backend matching engine)
-    if 'company_name' in columns_config and columns_config['company_name'] in df.columns:
-        df_clean[columns_config['company_name'] + "_normalized"] = df_clean[columns_config['company_name']].apply(normalize_entity_names)
-    if 'dba' in columns_config and columns_config['dba'] in df.columns:
-        df_clean[columns_config['dba'] + "_normalized"] = df_clean[columns_config['dba']].apply(normalize_entity_names)
+        elif semantic_name.startswith('zip'):
+            bad_zip = identify_zip_format_issues(df[col_name])
+            df_issues[col_name + "_has_format"] = bad_zip
+            if bad_zip.any():
+                df_issues.loc[bad_zip, "_issue_tags"] += "FORMAT_ISSUE,"
+                df_issues.loc[bad_zip, "_has_issue"] = True
+            df_clean[col_name] = df_clean[col_name].apply(standardize_zip)
+            
+        elif semantic_name.startswith('tin'):
+            bad_tin = identify_tin_format_issues(df[col_name])
+            df_issues[col_name + "_has_format"] = bad_tin
+            if bad_tin.any():
+                df_issues.loc[bad_tin, "_issue_tags"] += "FORMAT_ISSUE,"
+                df_issues.loc[bad_tin, "_has_issue"] = True
+            df_clean[col_name] = df_clean[col_name].apply(standardize_tin)
+            
+        elif semantic_name.startswith('address'):
+            df_clean[col_name + "_type"] = check_address_type(df[col_name])
+            df_clean[col_name] = df_clean[col_name].apply(standardize_name)
+            
+        elif semantic_name.startswith('datetime'):
+            df_clean[col_name] = standardize_datetime(df_clean[col_name])
+            
+        elif semantic_name.startswith('company_name') or semantic_name.startswith('dba') or semantic_name.startswith('first_name') or semantic_name.startswith('last_name') or semantic_name.startswith('city'):
+            df_clean[col_name] = df_clean[col_name].apply(standardize_name)
+            if semantic_name.startswith('company_name') or semantic_name.startswith('dba'):
+                df_clean[col_name + "_normalized"] = df_clean[col_name].apply(normalize_entity_names)
+                
+        elif semantic_name.startswith('state'):
+            df_clean[col_name] = df_clean[col_name].apply(standardize_state)
+            
+        elif semantic_name.startswith('country'):
+            df_clean[col_name] = df_clean[col_name].apply(standardize_country)
+            
+    # NEW: Business Address Parsing for Pipes
+    bus_addr_col = next((c for c in df.columns if 'business_address' in str(c).lower()), None)
+    if bus_addr_col:
+        lgl_col = next((c for c in df.columns if 'lgl_nm' in str(c).lower()), None)
+        dba_col = next((c for c in df.columns if 'dba_nm' in str(c).lower() or 'dba' in str(c).lower() and 'lgl' not in str(c).lower()), None)
         
-    # State and Country standardizers
-    if 'state' in columns_config and columns_config['state'] in df.columns:
-        st_col = columns_config['state']
-        df_clean[st_col] = df_clean[st_col].apply(standardize_state)
-    if 'country' in columns_config and columns_config['country'] in df.columns:
-        c_col = columns_config['country']
-        df_clean[c_col] = df_clean[c_col].apply(standardize_country)
+        parsed_cols = df.apply(lambda row: parse_piped_address(row, bus_addr_col, lgl_col, dba_col), axis=1)
+        parsed_cols.columns = ['address_1_worth', 'address_2_worth', 'city_worth', 'region_worth', 'zip_code_worth', 'country_worth', 'full_address_worth']
+        
+        for c in parsed_cols.columns:
+            df_clean[c] = parsed_cols[c]
 
     # 3. Entity Resolution & Structural Duplicates
     # Default is no structural tag
@@ -410,53 +463,74 @@ def run_data_check_and_cleaning(df: pd.DataFrame,
     feature_quality_orig = {}
     feature_quality_clean = {}
     
-    for semantic_name, col_name in columns_config.items():
-        if col_name in df.columns:
-            tot = len(df)
-            
-            # --- Original Stats ---
-            orig_missing = df_issues[col_name + "_is_missing"].sum() if (col_name + "_is_missing") in df_issues else df[col_name].isna().sum()
-            orig_invalid = 0
-            if (col_name + "_has_ws") in df_issues: orig_invalid += df_issues[col_name + "_has_ws"].sum()
-            if (col_name + "_has_sc") in df_issues: orig_invalid += df_issues[col_name + "_has_sc"].sum()
-            if (col_name + "_has_format") in df_issues: orig_invalid += df_issues[col_name + "_has_format"].sum()
-            
-            orig_m_pct = (orig_missing / tot) * 100
-            orig_i_pct = (orig_invalid / tot) * 100
-            orig_score = max(0, min(100, 100 - (orig_m_pct * 0.5) - orig_i_pct))
-            
-            feature_quality_orig[semantic_name] = {
-                "col_name": col_name,
-                "score": round(orig_score),
-                "missing": int(orig_missing),
-                "invalid": int(orig_invalid),
-                "m_pct": round(orig_m_pct, 1),
-                "i_pct": round(orig_i_pct, 1)
-            }
-            
-            # --- Cleaned Stats ---
-            clean_missing = df_clean[col_name].isna().sum()
-            clean_invalid = 0
-            # E.g. unfixable formats left over
-            if semantic_name == 'tin' and col_name in df_clean.columns:
-                clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^\d{2}-\d{7}$").eq(False).sum()
-            elif semantic_name == 'phone' and col_name in df_clean.columns:
-                clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$").eq(False).sum()
-            elif semantic_name == 'zip' and col_name in df_clean.columns:
-                clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^\d{5}$").eq(False).sum()
+    for col_name in df.columns:
+        tot = max(1, len(df))
+        
+        # Determine semantic role from columns_config mapping dynamically
+        semantic_name = 'general'
+        for k, v in columns_config.items():
+            if v == col_name:
+                semantic_name = k
+                break
                 
-            clean_m_pct = (clean_missing / tot) * 100
-            clean_i_pct = (clean_invalid / tot) * 100
-            clean_score = max(0, min(100, 100 - (clean_m_pct * 0.5) - clean_i_pct))
+        # --- Original Stats ---
+        orig_missing = df_issues[col_name + "_is_missing"].sum() if (col_name + "_is_missing") in df_issues else df[col_name].isna().sum()
+        orig_invalid = 0
+        if (col_name + "_has_ws") in df_issues: orig_invalid += df_issues[col_name + "_has_ws"].sum()
+        if (col_name + "_has_sc") in df_issues: orig_invalid += df_issues[col_name + "_has_sc"].sum()
+        if (col_name + "_has_format") in df_issues: orig_invalid += df_issues[col_name + "_has_format"].sum()
+        
+        orig_m_pct = (orig_missing / tot) * 100
+        orig_i_pct = (orig_invalid / tot) * 100
+        orig_penalty = (orig_m_pct * 0.5) + orig_i_pct
+        orig_score = max(0, min(100, 100 - orig_penalty))
+        
+        if (orig_missing > 0 or orig_invalid > 0) and orig_score > 99:
+            orig_score = 99.0
             
-            feature_quality_clean[semantic_name] = {
-                "col_name": col_name,
-                "score": round(clean_score),
-                "missing": int(clean_missing),
-                "invalid": int(clean_invalid),
-                "m_pct": round(clean_m_pct, 1),
-                "i_pct": round(clean_i_pct, 1)
-            }
+        feature_quality_orig[col_name] = {
+            "col_name": col_name,
+            "score": round(orig_score),
+            "missing": int(orig_missing),
+            "invalid": int(orig_invalid),
+            "m_pct": round(orig_m_pct, 1),
+            "i_pct": round(orig_i_pct, 1)
+        }
+        
+        # --- Cleaned Stats ---
+        clean_missing = df_clean[col_name].isna().sum()
+        clean_invalid = 0
+        
+        # Unfixable formats left over logic
+        if semantic_name.startswith('tin') and col_name in df_clean.columns:
+            clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^\d{2}-\d{7}$").eq(False).sum()
+        elif semantic_name.startswith('phone') and col_name in df_clean.columns:
+            clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^(\+1 )?\(\d{3}\) \d{3}-\d{4}$").eq(False).sum()
+        elif semantic_name.startswith('zip') and col_name in df_clean.columns:
+            clean_invalid += df_clean[col_name].dropna().astype(str).str.match(r"^\d{5}$").eq(False).sum()
+            
+        clean_m_pct = (clean_missing / tot) * 100
+        clean_i_pct = (clean_invalid / tot) * 100
+        clean_penalty = (clean_m_pct * 0.5) + clean_i_pct
+        clean_score = max(0, min(100, 100 - clean_penalty))
+        
+        if (clean_missing > 0 or clean_invalid > 0) and clean_score > 99:
+            clean_score = 99.0
+            
+        feature_quality_clean[col_name] = {
+            "col_name": col_name,
+            "score": round(clean_score),
+            "missing": int(clean_missing),
+            "invalid": int(clean_invalid),
+            "m_pct": round(clean_m_pct, 1),
+            "i_pct": round(clean_i_pct, 1)
+        }
+        
+    # Restrict final output to strictly what the user requires, hiding engine arrays
+    raw_col_order = df.columns.tolist()
+    worth_cols = [c for c in df_clean.columns if c.endswith('_worth') and c not in raw_col_order]
+    final_output_cols = [c for c in raw_col_order if c in df_clean.columns] + worth_cols
+    df_clean = df_clean[final_output_cols]
     
     # Generate stats summary
     stats = {
