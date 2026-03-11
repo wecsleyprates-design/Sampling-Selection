@@ -16,7 +16,7 @@ TEXT    = "#e0e0e0"
 ACCENT  = "#aad4f5"
 
 st.set_page_config(
-    page_title="Woth IA Data Check",
+    page_title="Worth IA Data Check",
     page_icon="🧹",
     layout="wide",
 )
@@ -712,7 +712,7 @@ if 'df_clean' in st.session_state:
             """
             <div style='background:#1b2533; border-left:4px solid #3498db; padding:8px 16px; margin-bottom:16px; color:#dcdcdc; font-size:15px; border-radius:4px;'>
                 <b style='color:#3498db;'>Feature-Level Quality Checks & Standardization Engine</b><br>
-                Before calculating statistics or evaluating duplicates, the Woth IA Engine scans every feature cell-by-cell. It categorizes bad records using predefined rules, scores their quality, and applies aggressive standardization where possible.
+                Before calculating statistics or evaluating duplicates, the Worth IA Engine scans every feature cell-by-cell. It categorizes bad records using predefined rules, scores their quality, and applies aggressive standardization where possible.
             </div>
             
             <style>
@@ -835,7 +835,7 @@ if 'df_clean' in st.session_state:
             def convert_csv_final(df):
                 return df.to_csv(index=False).encode('utf-8')
             csv_final = convert_csv_final(export_df)
-            st.download_button("⬇️ Download Final CSV", csv_final, "woth_final_cleaned_data.csv", "text/csv", use_container_width=True)
+            st.download_button("⬇️ Download Final CSV", csv_final, "worth_final_cleaned_data.csv", "text/csv", use_container_width=True)
             
         st.markdown("---")
         st.markdown(f"**Showing the first 100 rows with original `_received` and cleaned `_worth` features:**")
@@ -876,4 +876,4 @@ if 'df_clean' in st.session_state:
         }
         
         html_export = generate_html_report(m_html, c_html, t_html, a_notes)
-        export_placeholder.download_button("📥 Download Comprehensive Business Report (All Tabs)", data=html_export, file_name="WOTH_Enterprise_Data_Quality_Report.html", mime="text/html", use_container_width=True)
+        export_placeholder.download_button("📥 Download Comprehensive Business Report (All Tabs)", data=html_export, file_name="WORTH_Enterprise_Data_Quality_Report.html", mime="text/html", use_container_width=True)
