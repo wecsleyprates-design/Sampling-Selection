@@ -77,11 +77,18 @@ HTML_TEMPLATE = """
             gap: 20px;
             flex-wrap: wrap;
         }}
+        .table-container {{
+            overflow-x: auto;
+            width: 100%;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }}
         table {{
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
             font-size: 13px;
+            white-space: nowrap;
         }}
         th, td {{
             padding: 10px;
@@ -178,7 +185,9 @@ def generate_html_report(metrics_html, charts_html, tables_html, analyst_notes):
     if tables_html.get('filtered_issues'):
         s2_tables = f"""
         <h3>Top Anomalies by Feature & Severity</h3>
-        {tables_html['filtered_issues']}
+        <div class="table-container">
+            {tables_html['filtered_issues']}
+        </div>
         """
 
     content += f"""
@@ -215,7 +224,9 @@ def generate_html_report(metrics_html, charts_html, tables_html, analyst_notes):
     if tables_html.get('comp_table'):
         s3_comp_table = f"""
         <h3>Row-Level Modification Diffs</h3>
-        {tables_html['comp_table']}
+        <div class="table-container">
+            {tables_html['comp_table']}
+        </div>
         """
         
     content += f"""
@@ -291,7 +302,11 @@ def generate_html_report(metrics_html, charts_html, tables_html, analyst_notes):
     # ---------------------------------------------------------
     s5_table = ""
     if tables_html.get('final_table'):
-        s5_table = tables_html['final_table']
+        s5_table = f"""
+        <div class="table-container">
+            {{tables_html['final_table']}}
+        </div>
+        """
         
     content += f"""
     <div class="section">
