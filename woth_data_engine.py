@@ -191,38 +191,24 @@ def parse_piped_address(row, addr_col, lgl_col, dba_col):
     if not prefix_parts:
         return pd.Series(['', '', city, region, zipc, country, addr])
         
-    first_part = prefix_parts[0]
-    lgl = str(row.get(lgl_col, '')).strip().upper() if lgl_col else ''
-    dba = str(row.get(dba_col, '')).strip().upper() if dba_col else ''
-    first_upper = first_part.upper()
-    
-    def clean_for_cmp(v): return __import__('re').sub(r'[^A-Z0-9]', '', v)
-    c_first = clean_for_cmp(first_upper)
-    c_lgl = clean_for_cmp(lgl)
-    c_dba = clean_for_cmp(dba)
-    
-    is_match = False
-    if len(c_first) > 3:
-        import difflib
-        r_lgl = difflib.SequenceMatcher(None, c_first, c_lgl).ratio() if c_lgl else 0
-        r_dba = difflib.SequenceMatcher(None, c_first, c_dba).ratio() if c_dba else 0
-        
-        # Exact match or very high similarity means it's the company name
-        if c_first == c_lgl or c_first == c_dba or r_lgl > 0.85 or r_dba > 0.85:
-            is_match = True
-        # Or if the company name perfectly encapsulates the first token without address digits
-        elif not __import__('re').match(r'^\d+', first_part.strip()):
-            if (c_lgl and c_lgl in c_first and len(c_lgl) > 5) or (c_dba and c_dba in c_first and len(c_dba) > 5):
-                if max(r_lgl, r_dba) > 0.65:
-                    is_match = True
-    
-    if is_match:
-        prefix_parts = prefix_parts[1:]
-        
-    a1 = prefix_parts[0] if len(prefix_parts) > 0 else ''
-    a2 = prefix_parts[1] if len(prefix_parts) > 1 else ''
-    if len(prefix_parts) > 2:
-        a2 = ", ".join([p for p in prefix_parts[1:] if p])
+    # We now filter prefix_parts for actual street addresses.
+    # An actual street address typically starts with a number (PO BOX, 123 Main)
+    import re
+    valid_address_parts = []
+    for p in prefix_parts:
+        if not p.strip(): continue
+        p_upper = p.upper()
+        # Heuristics for a valid physical address: Starts with digits, or contains PO BOX/STE/UNIT
+        if re.search(r'(^\d+)|(P\.?O\.?\s*BOX)|(PO BOX)|(STE\s+\d+)|(UNIT\s+\w+)|(DEPT\s+\d+)|(ROUTE\s+\d+)', p_upper):
+            valid_address_parts.append(p)
+        # Or if it contains obvious street suffixes and isn't just the company name
+        elif re.search(r'\b(AVE|BLVD|DR|ST|RD|LN|WAY|PKWY|CIR|PL|TR|CT|HWY|HIGHWAY)\b', p_upper):
+            valid_address_parts.append(p)
+            
+    a1 = valid_address_parts[0] if len(valid_address_parts) > 0 else ''
+    a2 = valid_address_parts[1] if len(valid_address_parts) > 1 else ''
+    if len(valid_address_parts) > 2:
+        a2 = ", ".join(valid_address_parts[1:])
     
     valid_parts = [p for p in [a1, a2, city, region, zipc, country] if p]
     full_addr = ", ".join(valid_parts)
