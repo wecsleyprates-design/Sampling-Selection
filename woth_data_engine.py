@@ -198,8 +198,8 @@ def parse_piped_address(row, addr_col, lgl_col, dba_col):
     for p in prefix_parts:
         if not p.strip(): continue
         p_upper = p.upper()
-        # Heuristics for a valid physical address: Starts with digits, or contains PO BOX/STE/UNIT
-        if re.search(r'(^\d+)|(P\.?O\.?\s*BOX)|(PO BOX)|(STE\s+\d+)|(UNIT\s+\w+)|(DEPT\s+\d+)|(ROUTE\s+\d+)', p_upper):
+        # Heuristics for a valid physical address: Starts with digits, or contains PO BOX/STE/UNIT/PMB
+        if re.search(r'(^\d+)|(P\.?O\.?\s*BOX)|(PO BOX)|(STE\s+\d+)|(UNIT\s+\w+)|(DEPT\s+\d+)|(ROUTE\s+\d+)|(PMB\s+\d+)', p_upper):
             valid_address_parts.append(p)
         # Or if it contains obvious street suffixes and isn't just the company name
         elif re.search(r'\b(AVE|BLVD|DR|ST|RD|LN|WAY|PKWY|CIR|PL|TR|CT|HWY|HIGHWAY)\b', p_upper):
