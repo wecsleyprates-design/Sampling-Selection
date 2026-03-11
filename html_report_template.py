@@ -304,7 +304,7 @@ def generate_html_report(metrics_html, charts_html, tables_html, analyst_notes):
     if tables_html.get('final_table'):
         s5_table = f"""
         <div class="table-container">
-            {{tables_html['final_table']}}
+            {tables_html['final_table']}
         </div>
         """
         
