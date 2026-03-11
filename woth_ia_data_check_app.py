@@ -829,14 +829,24 @@ if 'df_clean' in st.session_state:
             export_df['Description_worth'] = export_df['Tag_worth'].apply(lambda x: DQ_TAG_DESC.get(x, 'Record is clean and passed structural uniqueness tests.'))
                 
         # Export logic
-        col1, col2 = st.columns([1, 4])
+        col1, col2, col3 = st.columns([1, 1, 3])
         with col1:
             @st.cache_data
             def convert_csv_final(df):
                 return df.to_csv(index=False).encode('utf-8')
             csv_final = convert_csv_final(export_df)
             st.download_button("⬇️ Download Final CSV", csv_final, "worth_final_cleaned_data.csv", "text/csv", use_container_width=True)
-            
+        
+        with col2:
+            import io
+            def convert_excel_final(df):
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                    df.to_excel(writer, index=False, sheet_name='Cleaned_Data')
+                return buffer.getvalue()
+                
+            excel_final = convert_excel_final(export_df)
+            st.download_button("📊 Download as Excel", excel_final, "worth_final_cleaned_data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
         st.markdown("---")
         st.markdown(f"**Showing the first 100 rows with original `_received` and cleaned `_worth` features:**")
         st.dataframe(export_df.head(100), use_container_width=True)
