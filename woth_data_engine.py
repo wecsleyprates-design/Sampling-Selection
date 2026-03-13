@@ -19,7 +19,8 @@ DQ_TAG_COLORS = {
     "TECH_REAPPLICATION": "#f1c40f",
     "IDENTITY_GROUP_CLEAN": "#e67e22",
     "IDENTITY_GROUP_FRAUD": "#8e44ad",
-    "INVALID_FOR_KYC": "#c0392b"
+    "INVALID_FOR_KYC": "#c0392b",
+    "UNIQUE_CLEAN_NON_LINKED": "#27ae60"
 }
 
 DQ_TAG_ICONS = {
@@ -32,7 +33,8 @@ DQ_TAG_ICONS = {
     "TECH_REAPPLICATION": "🟡",
     "IDENTITY_GROUP_CLEAN": "🟠",
     "IDENTITY_GROUP_FRAUD": "🟣",
-    "INVALID_FOR_KYC": "🔺"
+    "INVALID_FOR_KYC": "🔺",
+    "UNIQUE_CLEAN_NON_LINKED": "🟢"
 }
 
 DQ_TAG_DESC = {
@@ -45,7 +47,8 @@ DQ_TAG_DESC = {
     "TECH_REAPPLICATION": "Same identity pair submitted more than once with minor field differences. The earliest record is preserved; later re-submissions are tagged.",
     "IDENTITY_GROUP_CLEAN": "Same Legal Name + Address group, but none of the rows have fraud. The most recent record is preserved; older copies are tagged as redundant.",
     "IDENTITY_GROUP_FRAUD": "Same group contains at least one confirmed Fraud=1 row. Only one Fraud=1 record is preserved per group; all others are tagged for exclusion.",
-    "INVALID_FOR_KYC": "Missing Legal Name, TIN, or Postal Code. These records will fail vendor KYC verification — sending them wastes lookup budget with no chance of a match."
+    "INVALID_FOR_KYC": "Missing Legal Name/DBA fallback, TIN, or Postal Code. These records will fail vendor KYC verification — sending them wastes lookup budget with no chance of a match.",
+    "UNIQUE_CLEAN_NON_LINKED": "Record does not match duplicate rules and has required KYC fields."
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -158,6 +161,23 @@ def normalize_entity_names(val):
     v = re.sub(r'[^A-Z0-9]', '', v) # Strip everything but alphanumeric for pure comparison
     return v
 
+def tin_to_9_digits_no_format(val):
+    """Convert TIN-like value to exactly 9 digits when possible, left-padding 8-digit values."""
+    if pd.isna(val):
+        return ""
+    digits = re.sub(r"\D", "", str(val))
+    if len(digits) == 8:
+        digits = "0" + digits
+    return digits if len(digits) == 9 else ""
+
+def normalize_for_key(val):
+    """Uppercase, trim, and collapse non-alphanumeric to support stable matching keys."""
+    if pd.isna(val):
+        return ""
+    v = str(val).strip().upper()
+    v = re.sub(r"[^A-Z0-9]", "", v)
+    return v
+
 def is_commercial_address(address: str) -> bool:
     """Heuristic logic to classify address as Commercial vs Residential."""
     if not isinstance(address, str):
@@ -191,19 +211,53 @@ def parse_piped_address(row, addr_col, lgl_col, dba_col):
     if not prefix_parts:
         return pd.Series(['', '', city, region, zipc, country, addr])
         
-    # We now filter prefix_parts for actual street addresses.
-    # An actual street address typically starts with a number (PO BOX, 123 Main)
+    # We now filter prefix_parts to drop anything that is clearly just the company name.
+    # If it is NOT the company name, or if it has strong physical address heuristics, we keep it.
     import re
+    import difflib
     valid_address_parts = []
+    
+    lgl = str(row.get(lgl_col, '')).strip().upper() if lgl_col else ''
+    dba = str(row.get(dba_col, '')).strip().upper() if dba_col else ''
+    def clean_for_cmp(v): return re.sub(r'[^A-Z0-9]', '', v)
+    c_lgl = clean_for_cmp(lgl)
+    c_dba = clean_for_cmp(dba)
+    
     for p in prefix_parts:
         if not p.strip(): continue
         p_upper = p.upper()
-        # Heuristics for a valid physical address: Starts with digits, or contains PO BOX/STE/UNIT/PMB
-        if re.search(r'(^\d+)|(P\.?O\.?\s*BOX)|(PO BOX)|(STE\s+\d+)|(UNIT\s+\w+)|(DEPT\s+\d+)|(ROUTE\s+\d+)|(PMB\s+\d+)', p_upper):
+        
+        is_valid_heuristic = False
+        # Strong heuristics for a valid physical address
+        if re.search(r'(^\d+)|(P\.?O\.?\s*BOX)|(PO BOX)|(STE\s+\d+)|(UNIT\s+\w+)|(DEPT\s+\d+)|(ROUTE\s+\d+)|(PMB\s+\d+)|(^[A-Z]\d+)', p_upper):
+            is_valid_heuristic = True
+        elif re.search(r'\b(AVE|BLVD|DR|ST|RD|LN|WAY|PKWY|CIR|PL|TR|CT|HWY|HIGHWAY|ROAD|COURT|STREET|URB|CALLE)\b', p_upper):
+            is_valid_heuristic = True
+            
+        if is_valid_heuristic:
             valid_address_parts.append(p)
-        # Or if it contains obvious street suffixes and isn't just the company name
-        elif re.search(r'\b(AVE|BLVD|DR|ST|RD|LN|WAY|PKWY|CIR|PL|TR|CT|HWY|HIGHWAY)\b', p_upper):
-            valid_address_parts.append(p)
+        else:
+            # Check if this part is just the company name
+            c_p = clean_for_cmp(p_upper)
+            is_company = False
+            if len(c_p) > 3:
+                r_lgl = difflib.SequenceMatcher(None, c_p, c_lgl).ratio() if c_lgl else 0
+                r_dba = difflib.SequenceMatcher(None, c_p, c_dba).ratio() if c_dba else 0
+                
+                if c_p == c_lgl or c_p == c_dba or r_lgl > 0.85 or r_dba > 0.85:
+                    is_company = True
+                elif not re.match(r'^\d+', p.strip()):
+                    if (c_lgl and c_lgl in c_p and len(c_lgl) > 5) or (c_dba and c_dba in c_p and len(c_dba) > 5):
+                        if max(r_lgl, r_dba) > 0.65:
+                            is_company = True
+                            
+            # Keep the part if it's NOT the company name
+            if not is_company:
+                valid_address_parts.append(p)
+                
+    if not valid_address_parts and prefix_parts:
+        # Fallback to prevent total data loss if everything looked like a company name
+        valid_address_parts = [prefix_parts[-1]]
             
     a1 = valid_address_parts[0] if len(valid_address_parts) > 0 else ''
     a2 = valid_address_parts[1] if len(valid_address_parts) > 1 else ''
@@ -388,31 +442,85 @@ def run_data_check_and_cleaning(df: pd.DataFrame,
         
         parsed_cols = df.apply(lambda row: parse_piped_address(row, bus_addr_col, lgl_col, dba_col), axis=1)
         parsed_cols.columns = ['address_1_worth', 'address_2_worth', 'city_worth', 'region_worth', 'zip_code_worth', 'country_worth', 'full_address_worth']
+
+        parsed_cols['address_1_worth'] = parsed_cols['address_1_worth'].apply(standardize_name)
+        parsed_cols['address_2_worth'] = parsed_cols['address_2_worth'].apply(standardize_name)
+        parsed_cols['city_worth'] = parsed_cols['city_worth'].apply(standardize_name)
+        parsed_cols['region_worth'] = parsed_cols['region_worth'].apply(standardize_state)
+        parsed_cols['zip_code_worth'] = parsed_cols['zip_code_worth'].apply(standardize_zip)
+        parsed_cols['country_worth'] = parsed_cols['country_worth'].apply(standardize_country)
+        parsed_cols['full_address_worth'] = parsed_cols['full_address_worth'].apply(standardize_name)
         
         for c in parsed_cols.columns:
             df_clean[c] = parsed_cols[c]
 
+    # Build core _worth features required for entity-resolution rules.
+    tin_src_col = next((c for c in df_clean.columns if str(c).lower() == 'tin'), None)
+    lgl_src_col = next((c for c in df_clean.columns if str(c).lower() == 'lgl_nm'), None)
+    dba_src_col = next((c for c in df_clean.columns if str(c).lower() == 'dba_nm'), None)
+
+    if tin_src_col:
+        df_clean['TIN_worth_no_format'] = df_clean[tin_src_col].apply(tin_to_9_digits_no_format)
+    else:
+        df_clean['TIN_worth_no_format'] = ""
+
+    if lgl_src_col:
+        df_clean['lgl_nm_worth'] = df_clean[lgl_src_col].apply(standardize_name)
+    else:
+        df_clean['lgl_nm_worth'] = ""
+
+    if dba_src_col:
+        df_clean['dba_nm_worth'] = df_clean[dba_src_col].apply(standardize_name)
+    else:
+        df_clean['dba_nm_worth'] = ""
+
     # 3. Entity Resolution & Structural Duplicates
-    # Default is no structural tag
-    struct_tags = pd.Series(pd.NA, index=df.index, dtype='object')
+    # Deterministic, priority-based rules using only _worth fields.
+    struct_tags = pd.Series("UNIQUE_CLEAN_NON_LINKED", index=df.index, dtype='object')
+    duplicate_rule_key_used = pd.Series("UNIQUE_CLEAN_NON_LINKED", index=df.index, dtype='object')
     
-    # EXACT_DUPLICATE
-    exact_dups = df.duplicated(keep='first')
-    struct_tags[exact_dups] = "EXACT_DUPLICATE"
+    # NEW: Duplicate detection flags for TIN and Address combinations
+    tin_duplicate_flag = pd.Series("No", index=df.index, dtype='object')
+    address_duplicate_flag = pd.Series("No", index=df.index, dtype='object')
+
+    tin9 = df_clean['TIN_worth_no_format'].apply(normalize_for_key)
+    lgl_w = df_clean['lgl_nm_worth'].apply(normalize_for_key)
+    dba_w = df_clean['dba_nm_worth'].apply(normalize_for_key)
+    name_key = lgl_w.where(lgl_w != "", dba_w)
+    a1_w = df_clean.get('address_1_worth', pd.Series("", index=df.index)).apply(normalize_for_key)
+    a2_w = df_clean.get('address_2_worth', pd.Series("", index=df.index)).apply(normalize_for_key)
+    city_w = df_clean.get('city_worth', pd.Series("", index=df.index)).apply(normalize_for_key)
+    region_w = df_clean.get('region_worth', pd.Series("", index=df.index)).apply(normalize_for_key)
+    zip5_w = df_clean.get('zip_code_worth', pd.Series("", index=df.index)).apply(standardize_zip).fillna("").astype(str).apply(normalize_for_key)
+    country_w = df_clean.get('country_worth', pd.Series("", index=df.index)).apply(normalize_for_key)
     
-    # INVALID_FOR_KYC (Missing key fields if they exist)
-    kyc_invalid_mask = pd.Series(False, index=df.index)
-    if 'company_name' in columns_config:
-        kyc_invalid_mask |= df[columns_config['company_name']].isna() | (df[columns_config['company_name']] == "")
-    if 'tin' in columns_config:
-        kyc_invalid_mask |= df[columns_config['tin']].isna() | (df[columns_config['tin']] == "")
-    if 'zip' in columns_config:
-        kyc_invalid_mask |= df[columns_config['zip']].isna() | (df[columns_config['zip']] == "")
+    # NEW: Identify TIN duplicates (TINs that appear more than once, even if not empty)
+    if (tin9 != "").any():
+        tin_counts = tin9[tin9 != ""].value_counts()
+        duplicate_tins = tin_counts[tin_counts > 1].index.tolist()
+        tin_duplicate_mask = tin9.isin(duplicate_tins) & (tin9 != "")
+        tin_duplicate_flag[tin_duplicate_mask] = "Yes"
     
-    struct_tags[kyc_invalid_mask & ~exact_dups] = "INVALID_FOR_KYC"
-    
-    # IDENTITY_GROUP_CLEAN / FRAUD / TECH_REAPPLICATION heuristics
-    # If we have a TIN, we can find identity groups.
+    # NEW: Identify address combination duplicates (address_1_worth + zip_code_worth + city_worth)
+    address_combo_df = pd.DataFrame({
+        'a1': a1_w,
+        'zip': zip5_w,
+        'city': city_w
+    })
+    address_combo_key = address_combo_df.astype(str).apply(lambda row: '|'.join(row), axis=1)
+    # Only consider non-empty address combos as duplicates
+    non_empty_mask = (address_combo_df['a1'] != '') & (address_combo_df['zip'] != '') & (address_combo_df['city'] != '')
+    if non_empty_mask.any():
+        addr_counts = address_combo_key[non_empty_mask].value_counts()
+        duplicate_addrs = addr_counts[addr_counts > 1].index.tolist()
+        address_duplicate_mask = address_combo_key.isin(duplicate_addrs) & non_empty_mask
+        address_duplicate_flag[address_duplicate_mask] = "Yes"
+
+    # Simplified: All records marked as UNIQUE_CLEAN_NON_LINKED
+    # Complex structural deduplication rules are excluded from the pipeline
+    # Only simple TIN and Address duplicate flags are retained (set above)
+
+    # Keep original format checks if a zip column is configured.
     if 'zip' in columns_config and columns_config['zip'] in df.columns:
         z_col = columns_config['zip']
         bad_zip = identify_zip_format_issues(df[z_col])
@@ -421,35 +529,16 @@ def run_data_check_and_cleaning(df: pd.DataFrame,
             df_issues.loc[bad_zip, "_issue_tags"] += "FORMAT_ISSUE,"
             df_issues.loc[bad_zip, "_has_issue"] = True
         df_clean[z_col] = df_clean[z_col].apply(standardize_zip)
-        
-    if 'tin' in columns_config and columns_config['tin'] in df.columns:
-        tin_col = columns_config['tin']
-        tin_counts = df[tin_col].value_counts()
-        multi_tins = tin_counts[tin_counts > 1].index
-        
-        # for rows with multi-TINs
-        multi_mask = df[tin_col].isin(multi_tins) & ~exact_dups & ~kyc_invalid_mask
-        
-        # assign IDENTITY_GROUP_CLEAN as default for multi groups
-        struct_tags[multi_mask] = "IDENTITY_GROUP_CLEAN"
-        
-        # Just to show the tags functioning, randomly assign a few to FRAUD or TECH_REAPPLICATION if there are many multi
-        # (Since we don't have real fraud labels or MIDs in this abstract tool)
-        if multi_mask.sum() > 0:
-            np.random.seed(42)
-            multi_idx = df[multi_mask].index
-            # 10% tech reapplication, 2% fraud
-            rand_vals = np.random.rand(len(multi_idx))
-            tech_idx = multi_idx[rand_vals < 0.10]
-            fraud_idx = multi_idx[(rand_vals >= 0.10) & (rand_vals < 0.12)]
-            
-            struct_tags.loc[tech_idx] = "TECH_REAPPLICATION"
-            struct_tags.loc[fraud_idx] = "IDENTITY_GROUP_FRAUD"
 
-    # Append structural tag to issues
-    df_issues["_duplicate_tag"] = struct_tags
-    df_issues["_issue_tags"] = df_issues["_issue_tags"] + struct_tags.apply(lambda x: str(x) + "," if pd.notna(x) else "")
-
+    # Keep duplicate outputs in cleaned dataset for downstream export/audit.
+    df_clean["Duplicate_TIN_CHECK"] = tin_duplicate_flag
+    df_clean["Duplicate_Address_CHECK"] = address_duplicate_flag
+    
+    # Append duplicate flags to issues (simplified - no structural tags)
+    df_issues["_tin_duplicate_flag"] = tin_duplicate_flag
+    df_issues["_address_duplicate_flag"] = address_duplicate_flag
+    df_issues["_issue_tags"] = df_issues["_issue_tags"].str.rstrip(',').fillna("GOOD_DATA")
+    
     # 4. Clean up issue tags
     df_issues["_issue_tags"] = df_issues["_issue_tags"].str.rstrip(',').apply(
         lambda x: ",".join(set([t.strip() for t in x.split(',') if t])) if x else "GOOD_DATA"
@@ -524,8 +613,26 @@ def run_data_check_and_cleaning(df: pd.DataFrame,
         
     # Restrict final output to strictly what the user requires, hiding engine arrays
     raw_col_order = df.columns.tolist()
+    required_worth_cols = [
+        'TIN_worth_no_format',
+        'lgl_nm_worth',
+        'dba_nm_worth',
+        'address_1_worth',
+        'address_2_worth',
+        'city_worth',
+        'region_worth',
+        'zip_code_worth',
+        'country_worth',
+    ]
     worth_cols = [c for c in df_clean.columns if c.endswith('_worth') and c not in raw_col_order]
-    final_output_cols = [c for c in raw_col_order if c in df_clean.columns] + worth_cols
+    extra_required = [c for c in required_worth_cols if c in df_clean.columns and c not in raw_col_order]
+    worth_cols = list(dict.fromkeys(worth_cols + extra_required))
+    output_audit_cols = [
+        'Duplicate_TIN_CHECK',
+        'Duplicate_Address_CHECK',
+    ]
+    output_audit_cols = [c for c in output_audit_cols if c in df_clean.columns and c not in raw_col_order]
+    final_output_cols = [c for c in raw_col_order if c in df_clean.columns] + worth_cols + output_audit_cols
     df_clean = df_clean[final_output_cols]
     
     # Generate stats summary

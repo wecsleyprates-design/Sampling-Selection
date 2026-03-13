@@ -168,14 +168,22 @@ if 'df_clean' in st.session_state:
         # 1. Tab 1 Note (Raw Data & Identity)
         g_note = f"The engine successfully ingested {total:,} records. It identified {issues:,} records ({pct_issue}%) containing structure or format failures and detected {miss:,} absolute missing data points across the initial schema. Overall dataset resilience is {'Strong' if pct_issue < 20 else ('Moderate' if pct_issue < 50 else 'Weak')}."
         
-        # 2. Tab 2 Note (Anomalies)
-        f_note = "Evaluation of parsed columns:\n"
+        # 2. Tab 2 Note (Anomalies + Duplicates)
+        f_note = "Issue Analysis:\n"
         if feat_qual_orig:
             sorted_feats = sorted(feat_qual_orig.values(), key=lambda x: x['score'])
             worst = sorted_feats[0]
             best = sorted_feats[-1]
-            f_note += f"- Highest Risk Feature: {worst['col_name']} (Score: {worst['score']}%) suffered {worst['missing']} missing values and {worst['invalid']} structural format errors.\n"
-            f_note += f"- Safest Feature: {best['col_name']} (Score: {best['score']}%) remained highly structured with {best['missing']} missing values.\n"
+            f_note += f"- Highest Risk Feature: {worst['col_name']} (Score: {worst['score']}%) — {worst['missing']} missing values and {worst['invalid']} format errors.\n"
+            f_note += f"- Safest Feature: {best['col_name']} (Score: {best['score']}%) — {best['missing']} missing values.\n"
+        _tot = max(stats.get('total_rows', len(df_issues)), 1)
+        _td = int((df_issues['_tin_duplicate_flag'] == 'Yes').sum()) if '_tin_duplicate_flag' in df_issues.columns else 0
+        _ad = int((df_issues['_address_duplicate_flag'] == 'Yes').sum()) if '_address_duplicate_flag' in df_issues.columns else 0
+        f_note += "\nDuplicate Detection Summary:\n"
+        f_note += (f"- TIN Duplicates: {_td:,} records ({round(_td/_tot*100,1)}%) share a Tax ID with at least one other record — review for entity consolidation.\n"
+                   if _td > 0 else "- TIN Duplicates: None detected — all TINs are unique.\n")
+        f_note += (f"- Address Duplicates: {_ad:,} records ({round(_ad/_tot*100,1)}%) share an address combination — may indicate co-located or duplicate entities.\n"
+                   if _ad > 0 else "- Address Duplicates: None detected — all address combinations are unique.\n")
             
         # 3. Tab 3 Note (Clean vs Original)
         c_note = "Algorithmic transformation summary: "
@@ -189,15 +197,13 @@ if 'df_clean' in st.session_state:
         r_note = "Applied strict standardization matrices against string values, telephony, TIN formats, and piped business addresses to conform syntax prior to entity resolution."
         
         # 5. Tab 5 Note (Export Schema)
-        d_note = "Entity Resolution Profiling:\n"
-        if '_duplicate_tag' in df_issues.columns:
-            vc = df_issues['_duplicate_tag'].value_counts()
-            if not vc.empty:
-                d_note += f"The system isolated {vc.sum():,} structurally complex records via identical metadata. Dominant issue: {vc.index[0]} ({vc.iloc[0]:,} instances)."
-            else:
-                d_note += "No structural identity duplicates were identified."
+        _td5 = int((df_issues['_tin_duplicate_flag'] == 'Yes').sum()) if '_tin_duplicate_flag' in df_issues.columns else 0
+        _ad5 = int((df_issues['_address_duplicate_flag'] == 'Yes').sum()) if '_address_duplicate_flag' in df_issues.columns else 0
+        d_note = f"Final export contains {len(df_raw):,} total records with all _received (original) and _worth (standardized) columns plus duplicate detection flags. "
+        if _td5 > 0 or _ad5 > 0:
+            d_note += f"Duplicate flags: Duplicate_TIN_CHECK = Yes for {_td5:,} records; Duplicate_Address_CHECK = Yes for {_ad5:,} records. These require attention before downstream use."
         else:
-            d_note += "Duplicate checking matrix was not invoked."
+            d_note += "Duplicate_TIN_CHECK and Duplicate_Address_CHECK are both entirely 'No' — dataset is free of TIN and address duplicates."
 
         st.session_state['note_tab1'] = g_note
         st.session_state['note_tab2'] = f_note
@@ -233,6 +239,10 @@ if 'df_clean' in st.session_state:
         overall_score = round(fq_df['Score'].mean(), 1)
         score_color = "#27ae60" if overall_score > 80 else ("#f39c12" if overall_score > 50 else "#e74c3c")
         
+        # NEW: Add duplicate statistics if available
+        dup_tin_count = (df_issues['_tin_duplicate_flag'] == 'Yes').sum() if '_tin_duplicate_flag' in df_issues.columns else 0
+        dup_addr_count = (df_issues['_address_duplicate_flag'] == 'Yes').sum() if '_address_duplicate_flag' in df_issues.columns else 0
+        
         col_chart, col_score = st.columns([3, 1], vertical_alignment="center")
         
         with col_chart:
@@ -254,9 +264,20 @@ if 'df_clean' in st.session_state:
             <div style='text-align: center; padding: 2rem; background-color: #1e1e1e; border-radius: 10px; margin-top: 4rem;'>
                 <h3 style='margin: 0; color: #ffffff;'>Overall Dataset Score</h3>
                 <h1 style='color: {score_color}; font-size: 4rem; margin: 0;'>{overall_score}%</h1>
+                <p style='margin: 8px 0; font-size: 12px; color: #aaa;'>Feature Quality</p>
             </div>
             """
             st.markdown(html_content, unsafe_allow_html=True)
+        
+        # NEW: Display duplicate statistics
+        if dup_tin_count > 0 or dup_addr_count > 0:
+            st.markdown("---")
+            st.subheader("Duplicate Profile Statistics")
+            dup_col1, dup_col2 = st.columns(2)
+            with dup_col1:
+                st.markdown(_metric_card("TIN Duplicates", f"{dup_tin_count:,}", "#e74c3c"), unsafe_allow_html=True)
+            with dup_col2:
+                st.markdown(_metric_card("Address Duplicates", f"{dup_addr_count:,}", "#e74c3c"), unsafe_allow_html=True)
         
         st.markdown("---")
         st.subheader("Feature Assessments")
@@ -361,34 +382,6 @@ if 'df_clean' in st.session_state:
         st.subheader("Feature Quality Score")
         st.caption("Quality breakdown per column based on missing and invalid values")
         render_fq_tab(feat_qual_orig, is_clean=False)
-        
-        st.markdown("---")
-        st.subheader("Original Duplicate & Structural Tags")
-        if '_duplicate_tag' in df_issues.columns:
-            tag_counts = df_issues['_duplicate_tag'].value_counts().reset_index()
-            tag_counts.columns = ['Tag', 'Count']
-        else:
-            tag_counts = pd.DataFrame(columns=['Tag', 'Count'])
-            
-        col1, col2 = st.columns(2)
-        with col1:
-            if not tag_counts.empty:
-                fig_pie = px.pie(tag_counts, names='Tag', values='Count', color='Tag', 
-                                 color_discrete_map=DQ_TAG_COLORS, hole=0.5,
-                                 title="Phase 1 Structure (% of records)")
-                fig_pie.update_traces(textposition='outside', textinfo='percent+label')
-                fig_pie.update_layout(showlegend=False)
-                st.plotly_chart(_plotly_dark(fig_pie), use_container_width=True)
-                st.session_state['fig_pie'] = fig_pie
-        with col2:
-            if not tag_counts.empty:
-                tag_counts_sorted = tag_counts.sort_values(by='Count', ascending=True)
-                fig_bar = px.bar(tag_counts_sorted, x='Count', y='Tag', color='Tag', 
-                                 color_discrete_map=DQ_TAG_COLORS, orientation='h',
-                                 title="Record Count by Duplicate Tag", text='Count')
-                fig_bar.update_layout(showlegend=False)
-                st.plotly_chart(_plotly_dark(fig_bar), use_container_width=True)
-                st.session_state['fig_bar'] = fig_bar
                 
         st.markdown("---")
         st.subheader("Raw Data Sample by Standardization Rules")
@@ -396,11 +389,8 @@ if 'df_clean' in st.session_state:
         rule_sel = st.selectbox("Select Rule Type to View Failing Records:", ["FORMAT_ISSUE", "SPECIAL_CHARS", "WHITESPACE_ISSUE", "MISSING_VALUE"])
         # Find rows mapped to this issue
         rule_df = df_raw.copy()
-        df_issues['issue_count'] = df_issues['_issue_tags'].apply(lambda x: len(x.split(',')) if x != "GOOD_DATA" and x else 0)
-        rule_df['Total Issues'] = df_issues['issue_count']
-        rule_df['Tags'] = df_issues['_issue_tags'].apply(lambda x: str(x).replace("NaN", "").strip(","))
-        
-        matched_df = rule_df[rule_df['Tags'].str.contains(rule_sel, na=False)]
+        issue_tags_series = df_issues['_issue_tags'].fillna("").astype(str).str.replace("NaN", "", regex=False).str.strip(",")
+        matched_df = rule_df[issue_tags_series.str.contains(rule_sel, na=False)]
         if matched_df.empty:
             st.success(f"No records failed the {rule_sel} rule!")
         else:
@@ -509,6 +499,120 @@ if 'df_clean' in st.session_state:
             
         st.markdown("---")
         st.text_area("✍️ Analyst Interpretations / Error Strategy Details:", key="note_tab2", height=120, placeholder="Write your assessment of the specific column issues detected and mapping resolutions here to include in the HTML report.")
+        
+        # === NEW: DUPLICATE ANALYSIS IN TAB2 ===
+        st.markdown("---")
+        st.subheader("📊 Duplicate Detection Analysis")
+        
+        # Get duplicate statistics
+        tin_dup_count = (df_issues['_tin_duplicate_flag'] == 'Yes').sum() if '_tin_duplicate_flag' in df_issues.columns else 0
+        addr_dup_count = (df_issues['_address_duplicate_flag'] == 'Yes').sum() if '_address_duplicate_flag' in df_issues.columns else 0
+        
+        # Create Three Columns for Duplicate Metrics
+        m_col_dup1, m_col_dup2, m_col_dup3 = st.columns(3)
+        
+        with m_col_dup1:
+            st.markdown(_metric_card("TIN Duplicates Found", f"{tin_dup_count:,}", "#e74c3c" if tin_dup_count > 0 else "#27ae60"), unsafe_allow_html=True)
+        
+        with m_col_dup2:
+            st.markdown(_metric_card("Address Duplicates Found", f"{addr_dup_count:,}", "#e74c3c" if addr_dup_count > 0 else "#27ae60"), unsafe_allow_html=True)
+        
+        with m_col_dup3:
+            unique_records = len(df_raw) - tin_dup_count
+            st.markdown(_metric_card("Unique Records (by TIN)", f"{unique_records:,}", "#27ae60"), unsafe_allow_html=True)
+        
+        st.markdown("---")
+        st.subheader("Duplicate Breakdown by Type")
+        
+        # Create visualizations for duplicates
+        dup_chart_col1, dup_chart_col2 = st.columns(2)
+        
+        with dup_chart_col1:
+            if '_tin_duplicate_flag' in df_issues.columns:
+                tin_counts = df_issues['_tin_duplicate_flag'].value_counts().reset_index()
+                tin_counts.columns = ['Status', 'Count']
+                tin_counts['Status'] = tin_counts['Status'].map({'Yes': '🔴 Duplicate TIN', 'No': '✅ Unique TIN'})
+                
+                fig_tin = px.bar(tin_counts, x='Status', y='Count', color='Status',
+                                 color_discrete_map={'🔴 Duplicate TIN': '#e74c3c', '✅ Unique TIN': '#27ae60'},
+                                 title="TIN Duplicate Status Distribution", text='Count')
+                fig_tin.update_layout(showlegend=False, xaxis_title="", yaxis_title="Record Count")
+                st.plotly_chart(_plotly_dark(fig_tin), use_container_width=True, key="dup_tin_bar")
+                st.session_state['fig_tin_dup'] = fig_tin
+        
+        with dup_chart_col2:
+            if '_address_duplicate_flag' in df_issues.columns:
+                addr_counts = df_issues['_address_duplicate_flag'].value_counts().reset_index()
+                addr_counts.columns = ['Status', 'Count']
+                addr_counts['Status'] = addr_counts['Status'].map({'Yes': '🔴 Duplicate Address', 'No': '✅ Unique Address'})
+                
+                fig_addr = px.bar(addr_counts, x='Status', y='Count', color='Status',
+                                  color_discrete_map={'🔴 Duplicate Address': '#e74c3c', '✅ Unique Address': '#27ae60'},
+                                  title="Address Combo Duplicate Status Distribution", text='Count')
+                fig_addr.update_layout(showlegend=False, xaxis_title="", yaxis_title="Record Count")
+                st.plotly_chart(_plotly_dark(fig_addr), use_container_width=True, key="dup_addr_bar")
+                st.session_state['fig_addr_dup'] = fig_addr
+        
+        st.markdown("---")
+        st.subheader("Duplicate Analysis Tables")
+        
+        tab_dup_tin, tab_dup_addr = st.tabs(["🔴 Duplicate TIN Records", "🔴 Duplicate Address Records"])
+        
+        with tab_dup_tin:
+            st.markdown("**Records with Duplicate TIN (appears more than once in dataset)**")
+            dup_tin_records = df_raw[df_issues['_tin_duplicate_flag'] == 'Yes'].copy() if '_tin_duplicate_flag' in df_issues.columns else pd.DataFrame()
+            
+            if not dup_tin_records.empty:
+                tin_cols = [c for c in df_clean.columns if 'tin' in c.lower() and 'worth' in c.lower()]
+                name_cols = [c for c in df_clean.columns if ('lgl' in c.lower() or 'dba' in c.lower()) and '_worth' in c][:2]
+                addr_cols = [c for c in df_clean.columns if 'address' in c.lower() and '_worth' in c][:2]
+                city_cols = [c for c in df_clean.columns if 'city' in c.lower() and '_worth' in c]
+                zip_cols = [c for c in df_clean.columns if 'zip' in c.lower() and '_worth' in c]
+                
+                display_cols_tin = tin_cols + name_cols + addr_cols + city_cols + zip_cols
+                display_cols_tin = [c for c in display_cols_tin if c in df_clean.columns]
+                
+                if display_cols_tin:
+                    dup_tin_display = df_clean.loc[dup_tin_records.index, display_cols_tin].sort_values(by=tin_cols[0] if tin_cols else display_cols_tin[0])
+                    st.session_state['dup_tin_table'] = dup_tin_display
+                    st.dataframe(dup_tin_display, use_container_width=True)
+                    
+                    csv_dup_tin = dup_tin_display.to_csv(index=False).encode('utf-8')
+                    st.download_button("⬇️ Download Duplicate TIN Records (CSV)", csv_dup_tin, "duplicate_tin_records.csv", "text/csv", use_container_width=True, key="download_dup_tin_csv")
+                    
+                    st.metric("Total Duplicate TIN Records Found", len(dup_tin_records))
+                else:
+                    st.dataframe(df_clean.loc[dup_tin_records.index], use_container_width=True)
+            else:
+                st.info("No duplicate TIN records found.")
+        
+        with tab_dup_addr:
+            st.markdown("**Records with Duplicate Address Combination (address_1 + zip_code + city appears more than once)**")
+            dup_addr_records = df_raw[df_issues['_address_duplicate_flag'] == 'Yes'].copy() if '_address_duplicate_flag' in df_issues.columns else pd.DataFrame()
+            
+            if not dup_addr_records.empty:
+                addr_cols = [c for c in df_clean.columns if ('address_1' in c.lower() or 'address_2' in c.lower()) and '_worth' in c][:2]
+                city_cols = [c for c in df_clean.columns if 'city' in c.lower() and '_worth' in c]
+                zip_cols = [c for c in df_clean.columns if 'zip' in c.lower() and '_worth' in c]
+                name_cols = [c for c in df_clean.columns if ('lgl' in c.lower() or 'dba' in c.lower()) and '_worth' in c][:2]
+                tin_cols = [c for c in df_clean.columns if 'tin' in c.lower() and 'worth' in c.lower()]
+                
+                display_cols_addr = addr_cols + city_cols + zip_cols + name_cols + tin_cols
+                display_cols_addr = [c for c in display_cols_addr if c in df_clean.columns]
+                
+                if display_cols_addr:
+                    dup_addr_display = df_clean.loc[dup_addr_records.index, display_cols_addr].sort_values(by=addr_cols[0] if addr_cols else display_cols_addr[0])
+                    st.session_state['dup_addr_table'] = dup_addr_display
+                    st.dataframe(dup_addr_display, use_container_width=True)
+                    
+                    csv_dup_addr = dup_addr_display.to_csv(index=False).encode('utf-8')
+                    st.download_button("⬇️ Download Duplicate Address Records (CSV)", csv_dup_addr, "duplicate_address_records.csv", "text/csv", use_container_width=True, key="download_dup_addr_csv")
+                    
+                    st.metric("Total Duplicate Address Records Found", len(dup_addr_records))
+                else:
+                    st.dataframe(df_clean.loc[dup_addr_records.index], use_container_width=True)
+            else:
+                st.info("No duplicate address records found.")
             
     with TAB3:
         st.subheader("Cleaned Dataset Feature Score Quality")
@@ -657,7 +761,7 @@ if 'df_clean' in st.session_state:
                     fig_unres = px.bar(chart_df, x='Count', y='Feature', color='Failure Reason', orientation='h', 
                                        title="Distribution of Unfixable Records by Feature & Reason", text='Count',
                                        color_discrete_sequence=px.colors.qualitative.Pastel)
-                    st.plotly_chart(_plotly_dark(fig_unres), use_container_width=True)
+                    st.plotly_chart(_plotly_dark(fig_unres), use_container_width=True, key="unresolved_failures_bar")
                     st.session_state['fig_unres'] = fig_unres
                     st.markdown("---")
                 
@@ -758,18 +862,14 @@ if 'df_clean' in st.session_state:
             </table>
             
             <div style='background:#1b2533; border-left:4px solid #e67e22; padding:8px 16px; margin-bottom:16px; color:#dcdcdc; font-size:15px; border-radius:4px;'>
-                <b style='color:#e67e22;'>Entity Resolution (Duplicate Tags)</b><br>
-                Once features are standardized using the rules above, the system applies structural tags in priority order to accurately categorize exact clones versus complex Identity groups.
+                <b style='color:#e67e22;'>Duplicate Detection Rules</b><br>
+                After standardization, the system identifies two types of duplicates based on key identifiers for data deduplication and compliance workflows.
             </div>
 
             <table class='rules-table'>
-                <tr><th>Priority</th><th>Tag</th><th>Rule Logic</th><th>Exclusion Action</th></tr>
-                <tr><td class='t-pri'>1</td><td class='t-tag' style='color:#c0392b;'>EXACT_DUPLICATE</td><td>All original fields are byte-for-byte identical to another row.</td><td>The first occurrence is preserved; all later copies are dropped.</td></tr>
-                <tr><td class='t-pri'>2</td><td class='t-tag' style='color:#8e44ad;'>IDENTITY_GROUP_FRAUD</td><td>Same TIN + Address group contains at least one confirmed fraud=1 record.</td><td>Preserve the earliest fraud record; exclude all others to prevent signal leakage.</td></tr>
-                <tr><td class='t-pri'>3</td><td class='t-tag' style='color:#e67e22;'>IDENTITY_GROUP_CLEAN</td><td>Same TIN + Address group, none are fraud.</td><td>Keep only the most recent updated record; Drop repetitive older ones.</td></tr>
-                <tr><td class='t-pri'>4</td><td class='t-tag' style='color:#f1c40f;'>TECH_REAPPLICATION</td><td>Same TIN exactly, differing minor field values (resubmissions).</td><td>Preserve earliest attempt chronologically; drop others.</td></tr>
-                <tr><td class='t-pri'>5</td><td class='t-tag' style='color:#c0392b;'>INVALID_FOR_KYC</td><td>Missing Legal Name, TIN, or Postal Code entirely.</td><td>Dropped immediately. These will fail Vendor KYC verification and waste budget.</td></tr>
-                
+                <tr><th>Detection Type</th><th>Criteria</th><th>Flag Name</th><th>Possible Values</th></tr>
+                <tr><td><b>TIN Duplicate</b></td><td>Same Tax ID (EIN) appears more than once in the dataset. Only non-empty TINs are considered.</td><td><code>Duplicate_TIN_CHECK</code></td><td><code>Yes</code> (Duplicate Found) | <code>No</code> (Unique)</td></tr>
+                <tr><td><b>Address Duplicate</b></td><td>Same combination of address_1_worth + zip_code_worth + city_worth appears more than once. All three fields must be non-empty.</td><td><code>Duplicate_Address_CHECK</code></td><td><code>Yes</code> (Duplicate Found) | <code>No</code> (Unique)</td></tr>
             </table>
             """
         , unsafe_allow_html=True)
@@ -822,19 +922,22 @@ if 'df_clean' in st.session_state:
             if c not in export_df.columns:
                 export_df[c] = df_clean[c]
                 
-        # 5. Append Duplicate Tag_worth and Description_worth matching the UI Rules
-        if '_duplicate_tag' in df_issues.columns:
-            export_df['Tag_worth'] = df_issues['_duplicate_tag'].fillna('NO_DUPLICATE_ISSUE')
-            export_df['Description_worth'] = export_df['Tag_worth'].apply(lambda x: DQ_TAG_DESC.get(x, 'Record is clean and passed structural uniqueness tests.'))
-                
+        # 5. Add TIN and Address Duplicate Flags only (exclude structural tags)
+        if '_tin_duplicate_flag' in df_issues.columns:
+            export_df['Duplicate_TIN_CHECK'] = df_issues['_tin_duplicate_flag'].fillna('No')
+        if '_address_duplicate_flag' in df_issues.columns:
+            export_df['Duplicate_Address_CHECK'] = df_issues['_address_duplicate_flag'].fillna('No')
+
+        st.markdown("---")
+        
         # Export logic
-        col1, col2, col3 = st.columns([1, 1, 3])
+        col1, col2 = st.columns(2)
         with col1:
             @st.cache_data
             def convert_csv_final(df):
                 return df.to_csv(index=False).encode('utf-8')
             csv_final = convert_csv_final(export_df)
-            st.download_button("⬇️ Download Final CSV", csv_final, "worth_final_cleaned_data.csv", "text/csv", use_container_width=True)
+            st.download_button("⬇️ Download Final CSV", csv_final, "worth_final_cleaned_data.csv", "text/csv", use_container_width=True, key="download_final_csv")
         
         with col2:
             import io
@@ -845,44 +948,88 @@ if 'df_clean' in st.session_state:
                 return buffer.getvalue()
                 
             excel_final = convert_excel_final(export_df)
-            st.download_button("📊 Download as Excel", excel_final, "worth_final_cleaned_data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
+            st.download_button("📊 Download as Excel", excel_final, "worth_final_cleaned_data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True, key="download_final_excel")
+
+        
         st.markdown("---")
-        st.markdown(f"**Showing the first 100 rows with original `_received` and cleaned `_worth` features:**")
+        st.markdown(f"**Showing {min(len(export_df), 100):,} of {len(export_df):,} records (max 100 displayed):**")
         st.dataframe(export_df.head(100), use_container_width=True)
         
         st.markdown("---")
         st.text_area("✍️ Analyst Interpretations / Final Delivered Schema:", key="note_tab5", height=120, placeholder="Write your concluding assessment of the final modeling dataset here.")
 
         # --- BUILD AND INJECT HTML REPORT ---
+        # Compute stats needed for HTML report
+        _tin_dup_ct  = int((df_issues['_tin_duplicate_flag'] == 'Yes').sum()) if '_tin_duplicate_flag' in df_issues.columns else 0
+        _addr_dup_ct = int((df_issues['_address_duplicate_flag'] == 'Yes').sum()) if '_address_duplicate_flag' in df_issues.columns else 0
+        _unique_by_tin = len(df_raw) - _tin_dup_ct
+        _orig_miss    = int(df_raw.isna().sum().sum())
+        _fq_raw_avg   = round(pd.DataFrame.from_dict(feat_qual_orig, orient='index')['score'].mean(), 1) if feat_qual_orig else 0
+        _fq_cln_avg   = round(pd.DataFrame.from_dict(feat_qual_clean, orient='index')['score'].mean(), 1) if feat_qual_clean else 0
+
         m_html = {
-            'tab1_metrics': dict_to_metric_html("Total Rows", f"{stats['total_rows']:,}") +
-                            dict_to_metric_html("Good Rows", f"{stats['good_rows']:,}", "#27ae60") +
-                            dict_to_metric_html("Rows w/ Issues", f"{stats['rows_with_issues']:,}", "#e74c3c"),
-            'tab3_metrics': dict_to_metric_html("Original Missing", f"{df_raw.isna().sum().sum():,}", "#e74c3c")
+            'tab1_metrics': (
+                dict_to_metric_html("Total Rows",     f"{stats['total_rows']:,}",         "#2980b9") +
+                dict_to_metric_html("Good Rows",      f"{stats['good_rows']:,}",           "#27ae60") +
+                dict_to_metric_html("Rows w/ Issues", f"{stats['rows_with_issues']:,}",    "#e74c3c") +
+                dict_to_metric_html("Missing Values", f"{_orig_miss:,}",                  "#e67e22") +
+                dict_to_metric_html("Raw DQ Score",   f"{_fq_raw_avg}%",                  "#8e44ad")
+            ),
+            'tab3_metrics': (
+                dict_to_metric_html("Original Missing", f"{_orig_miss:,}",                "#e74c3c") +
+                dict_to_metric_html("Broken Formats",   f"{total_orig_anomalies:,}",      "#f39c12") +
+                dict_to_metric_html("Unresolved",       f"{unfixable:,}",                 "#e74c3c" if unfixable > 0 else "#27ae60") +
+                dict_to_metric_html("Clean Missing",    f"{df_clean.isna().sum().sum():,}", "#3498db") +
+                dict_to_metric_html("Clean DQ Score",   f"{_fq_cln_avg}%",                "#27ae60")
+            ),
+            'dup_metrics': (
+                dict_to_metric_html("Total Records",       f"{len(df_raw):,}",         "#2980b9") +
+                dict_to_metric_html("TIN Duplicates",      f"{_tin_dup_ct:,}",         "#e74c3c" if _tin_dup_ct  > 0 else "#27ae60") +
+                dict_to_metric_html("Address Duplicates",  f"{_addr_dup_ct:,}",        "#e74c3c" if _addr_dup_ct > 0 else "#27ae60") +
+                dict_to_metric_html("Unique (by TIN)",     f"{_unique_by_tin:,}",      "#27ae60")
+            ),
         }
-        
+
         c_html = {
-            'tag_pie': extract_plotly_html(st.session_state.get('fig_pie')),
-            'tag_bar': extract_plotly_html(st.session_state.get('fig_bar')),
-            'sev_bar': extract_plotly_html(st.session_state.get('fig_sev')),
-            'type_pie': extract_plotly_html(st.session_state.get('fig_type')),
+            'fq_bar':       extract_plotly_html(st.session_state.get('fig_fq')),
+            'tin_dup_bar':  extract_plotly_html(st.session_state.get('fig_tin_dup')),
+            'addr_dup_bar': extract_plotly_html(st.session_state.get('fig_addr_dup')),
+            'sev_bar':      extract_plotly_html(st.session_state.get('fig_sev')),
+            'type_pie':     extract_plotly_html(st.session_state.get('fig_type')),
             'fq_bar_clean': extract_plotly_html(st.session_state.get('fig_fq_clean')),
-            'unres_bar': extract_plotly_html(st.session_state.get('fig_unres'))
+            'unres_bar':    extract_plotly_html(st.session_state.get('fig_unres')),
         }
-        
+
+        _dup_tin_df  = st.session_state.get('dup_tin_table',  pd.DataFrame())
+        _dup_addr_df = st.session_state.get('dup_addr_table', pd.DataFrame())
+
         t_html = {
-            'filtered_issues': st.session_state.get('df_filtered_issues', pd.DataFrame()).to_html(index=False, classes="table") if 'df_filtered_issues' in st.session_state else "",
-            'comp_table': st.session_state.get('df_comp_table', pd.DataFrame()).head(100).to_html(index=False, classes="table") if 'df_comp_table' in st.session_state else "",
-            'final_table': export_df.head(50).to_html(index=False, classes="table")
+            'filtered_issues': st.session_state['df_filtered_issues'].to_html(index=False, classes="table") if 'df_filtered_issues' in st.session_state else "",
+            'comp_table':      st.session_state['df_comp_table'].head(100).to_html(index=False, classes="table") if 'df_comp_table' in st.session_state else "",
+            'final_table':     export_df.head(50).to_html(index=False, classes="table"),
+            'dup_tin_table':   _dup_tin_df.to_html(index=False, classes="table") if not _dup_tin_df.empty else "",
+            'dup_addr_table':  _dup_addr_df.to_html(index=False, classes="table") if not _dup_addr_df.empty else "",
         }
-        
+
         a_notes = {
             'note_tab1': st.session_state.get('note_tab1', ''),
             'note_tab2': st.session_state.get('note_tab2', ''),
             'note_tab3': st.session_state.get('note_tab3', ''),
             'note_tab4': st.session_state.get('note_tab4', ''),
-            'note_tab5': st.session_state.get('note_tab5', '')
+            'note_tab5': st.session_state.get('note_tab5', ''),
         }
-        
-        html_export = generate_html_report(m_html, c_html, t_html, a_notes)
+
+        raw_stats = {
+            'total_rows':       len(df_raw),
+            'good_rows':        stats.get('good_rows', 0),
+            'rows_with_issues': stats.get('rows_with_issues', 0),
+            'missing_values':   _orig_miss,
+            'tin_dups':         _tin_dup_ct,
+            'addr_dups':        _addr_dup_ct,
+            'unfixable':        unfixable,
+            'overall_fq_raw':   _fq_raw_avg,
+            'overall_fq_clean': _fq_cln_avg,
+        }
+
+        html_export = generate_html_report(m_html, c_html, t_html, a_notes, raw_stats=raw_stats)
         export_placeholder.download_button("📥 Download Comprehensive Business Report (All Tabs)", data=html_export, file_name="WORTH_Enterprise_Data_Quality_Report.html", mime="text/html", use_container_width=True)
